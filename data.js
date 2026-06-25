@@ -6,9 +6,9 @@ const ranks = [
 const ranksStyles = [
     { background: "#ffffff", color: "#000000" }, 
     { background: "#252525", color: "#F1C232" }, 
-    { background: "#a64d79", color: "#cfe2f3" }, 
+    { background: "#9e4058", color: "#eaf8fd" }, 
+    { background: "#d88d6f", color: "#000000" }, 
     { background: "#ffd966", color: "#000000" }, 
-    { background: "#FFE699", color: "#000000" }, 
     { background: "#FFF2CC", color: "#000000" }, 
     { background: "#D9D2E9", color: "#000000" }, 
     { background: "#A2A7FE", color: "#000000" }, 
@@ -88,7 +88,7 @@ const islands = [
 }
 ];
 
-const dlcIslands = [
+const lobberDlcIslands = [
 {
     name: "Inkwell Isle 1",
     color: "#a7c8cf",
@@ -118,12 +118,12 @@ const version11Residual = [
     690.81, 694.05, 697.29, 700.53, 703.77, 707.01, 710.25, 713.49, 716.73, 720
 ];
 
-const dlcResidual = [
+const lobberDlcResidual = [
     250.83, 251.34, 251.85, 252.36, 252.87, 253.38, 253.89, 254.4, 254.91,
     255.42, 255.93, 256.44, 256.95, 257.46, 257.97, 258.48, 258.99, 259.5, 260.01
 ];
 
-const dlcSob = [
+const lobberDlcSob = [
     603.81, 613.56, 623.31, 633.06, 642.81, 652.56, 662.31, 672.06, 681.81,
     691.56, 701.31, 711.06, 720.81, 730.56, 740.31, 750.06, 759.81, 769.56, 779
 ];
@@ -165,24 +165,24 @@ const chargeDlcSob = [
 
 const speedrunCategories = [
     {
-        id: "version-1-1",
-        label: "1.1",
-        title: "Game Version 1.1",
+        id: "1-1",
+        label: "1.1+",
+        title: "1.1+ Category",
         islands,
         residual: version11Residual
     },
     {
-        id: "version-DLC",
+        id: "DLC",
         label: "DLC",
-        title: "DLC Table",
+        title: "DLC Category",
         subOptions: [
             {
                 id: "lobber",
                 label: "Lobber",
                 icon: "https://myekul.com/shared-assets/cuphead/images/inventory/weapon/lobber.png",
-                islands: dlcIslands,
-                residual: dlcResidual,
-                sob: dlcSob
+                islands: lobberDlcIslands,
+                residual: lobberDlcResidual,
+                sob: lobberDlcSob
             },
             {
                 id: "charge",
