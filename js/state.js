@@ -3,6 +3,7 @@
 const table = document.getElementById("table");
 const totals = document.getElementById("totals");
 const rankChart = document.getElementById("rank-chart");
+const rankChartPie = document.getElementById("rank-chart-pie");
 const categoryTabs = document.getElementById("category-tabs");
 
 const isPersonalTimesPage = document.body.dataset.page === "personal-times";

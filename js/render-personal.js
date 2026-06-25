@@ -162,7 +162,7 @@ function renderPersonalTotals()
 <table class="personal-totals-table">
 <thead>
 <tr>
-    <th class="island sticky-col-1">Isle Times</th>
+    <th class="island sticky-col-1">Total Times</th>
     <th class="personal-time-col"></th>
 </tr>
 </thead>
@@ -205,25 +205,37 @@ function renderRankChart()
 {
     if (!rankChart) return;
 
+    const currentTable = document.getElementById("table");
+    if (!currentTable) return;
+
     const distribution = getPersonalRankDistribution();
-    const filledCount = distribution.reduce((sum, item) => sum + item.count, 0);
+    const displayRanks = distribution.filter(item => item.count > 0);
+    const filledCount = displayRanks.reduce((sum, item) => sum + item.count, 0);
     const totalCount = getTotalLevelCount();
-    const visibleRanks = distribution.filter(item => item.count > 0);
-    const topRank = visibleRanks[0];
-    const mostCommonRank = visibleRanks.reduce((best, item) =>
+    const topRank = displayRanks[0] || null;
+    const mostCommonRank = displayRanks.reduce((best, item) =>
         !best || item.count > best.count ? item : best,
         null
     );
 
+    const formatRankLabel = rank => {
+        if (!rank) return "Unknown Rank";
+        const normalized = rank.trim();
+        if (normalized.length === 0) return "Unknown Rank";
+        return normalized.endsWith("Rank") || normalized.endsWith("rank")
+            ? normalized
+            : `${normalized} Rank`;
+    };
+
     const segmentsHtml = filledCount === 0
         ? `<div class="rank-chart-empty-segment"></div>`
-        : visibleRanks.map(item =>
+        : displayRanks.map(item =>
         {
             const percent = (item.count / filledCount) * 100;
             return `
             <span
                 class="rank-chart-segment"
-                title="${item.rank}: ${item.count}"
+                title="${formatRankLabel(item.rank)}: ${item.count}"
                 style="width: ${percent}%; background: ${item.style.background};"
             ></span>
             `;
@@ -231,11 +243,11 @@ function renderRankChart()
 
     const rowsHtml = filledCount === 0
         ? `<div class="rank-chart-empty">No times yet</div>`
-        : visibleRanks.map(item =>
+        : displayRanks.map(item =>
         {
             const percent = Math.round((item.count / filledCount) * 100);
             return `
-            <div class="rank-chart-row">
+            <div class="rank-chart-row" title="${formatRankLabel(item.rank)}: ${item.count}">
                 <span class="rank-chart-badge" style="background: ${item.style.background}; color: ${item.style.color};">${item.rank}</span>
                 <div class="rank-chart-track">
                     <span style="width: ${percent}%; background: ${item.style.background};"></span>
@@ -245,13 +257,23 @@ function renderRankChart()
             `;
         }).join("");
 
+    const pieChartSegments = filledCount === 0
+        ? "repeating-linear-gradient(135deg, #2b2254 0 8px, #11092c 8px 16px)"
+        : displayRanks.map((item, index) =>
+        {
+            const start = index === 0 ? 0 : displayRanks.slice(0, index).reduce((sum, previous) => sum + (previous.count / filledCount) * 100, 0);
+            const end = start + (item.count / filledCount) * 100;
+            return `${item.style.background} ${start.toFixed(2)}% ${end.toFixed(2)}%`;
+        }).join(", ");
+
+    const pieChartStyle = `background: ${filledCount === 0 ? "transparent" : `conic-gradient(${pieChartSegments})`};`;
+
     rankChart.innerHTML = `
     <div class="rank-chart-header">
         <div>
             <h2>Rank Distribution</h2>
             <span>${filledCount}/${totalCount} times</span>
         </div>
-        <strong>${topRank ? topRank.rank : "-"}</strong>
     </div>
     <div class="rank-chart-stack">${segmentsHtml}</div>
     <div class="rank-chart-stats">
@@ -268,6 +290,83 @@ function renderRankChart()
         ${rowsHtml}
     </div>
     `;
+
+if (rankChartPie) {
+    rankChartPie.innerHTML = filledCount === 0
+        ? ""
+        : `
+        <div class="rank-chart-pie-wrapper">
+            <div class="rank-chart-pie" style="${pieChartStyle}"></div>
+            <div class="rank-chart-tooltip"></div>
+        </div>
+        `;
+
+    if (filledCount > 0) {
+        const pie = rankChartPie.querySelector(".rank-chart-pie");
+        const tooltip = rankChartPie.querySelector(".rank-chart-tooltip");
+
+        const slices = [];
+        let currentAngle = 0;
+
+        displayRanks.forEach(item => {
+            const sliceAngle = (item.count / filledCount) * 360;
+
+            slices.push({
+                start: currentAngle,
+                end: currentAngle + sliceAngle,
+                rank: formatRankLabel(item.rank),
+                percent: Math.round((item.count / filledCount) * 100),
+                color: item.style.background
+            });
+
+            currentAngle += sliceAngle;
+        });
+
+        pie.addEventListener("mousemove", e => {
+            const rect = pie.getBoundingClientRect();
+
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            const dx = e.clientX - centerX;
+            const dy = e.clientY - centerY;
+
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance > rect.width / 2) {
+                tooltip.style.opacity = "0";
+                return;
+            }
+
+            let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            angle = (angle + 90 + 360) % 360;
+
+            const slice = slices.find(
+                s => angle >= s.start && angle < s.end
+            );
+
+            if (!slice) {
+                tooltip.style.opacity = "0";
+                return;
+            }
+
+            tooltip.innerHTML = `
+                <span style="color:${slice.color}">
+                    ${slice.rank}
+                </span>
+                • ${slice.percent}%
+            `;
+
+            tooltip.style.left = `${e.clientX}px`;
+            tooltip.style.top = `${e.clientY}px`;
+            tooltip.style.opacity = "1";
+        });
+
+        pie.addEventListener("mouseleave", () => {
+            tooltip.style.opacity = "0";
+        });
+    }
+}
 }
 
 /**
@@ -301,5 +400,9 @@ function renderPlaceholderTable()
 
     if (rankChart) {
         rankChart.innerHTML = "";
+    }
+
+    if (rankChartPie) {
+        rankChartPie.innerHTML = "";
     }
 }

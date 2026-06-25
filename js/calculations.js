@@ -5,18 +5,39 @@
  * Residual is based on the user's average rank across all levels
  * @returns {Array} Array of row objects with name, total, and thresholds
  */
+function getPersonalTimeEntries()
+{
+    const storedTimes = getStoredPersonalTimes();
+    const currentTable = document.getElementById("table");
+    const inputs = currentTable ? [...currentTable.querySelectorAll(".time-input")] : [];
+
+    return inputs.map(input =>
+    {
+        const levelIndex = Number(input.dataset.levelIndex || 0);
+        const level = getLevelByFlatIndex(levelIndex);
+        const value = input.value.trim();
+        const seconds = value ? parseTime(value) : parseTime(storedTimes[input.id] || "");
+
+        return {
+            input,
+            level,
+            seconds
+        };
+    }).filter(entry => entry.level);
+}
+
 function getPersonalTotalsData()
 {
-    const inputs = [...table.querySelectorAll(".time-input")];
+    const entries = getPersonalTimeEntries();
     const islandRows = [];
-    let inputIndex = 0;
+    let entryIndex = 0;
 
     getActiveIslands().forEach((island, islandIndex) =>
     {
         const values = island.levels.map(() =>
         {
-            const input = inputs[inputIndex++];
-            return input ? parseTime(input.value) : null;
+            const entry = entries[entryIndex++];
+            return entry ? entry.seconds : null;
         });
         const hasAllTimes = values.every(value => value !== null);
 
@@ -79,17 +100,13 @@ function getPersonalTotalsData()
  */
 function getAverageRankIndex()
 {
-    const inputs = [...table.querySelectorAll(".time-input")];
     const rankIndices = [];
 
-    inputs.forEach(input =>
+    getPersonalTimeEntries().forEach(entry =>
     {
-        const level = getLevelByFlatIndex(Number(input.dataset.levelIndex));
-        const seconds = parseTime(input.value);
+        if (entry.seconds === null) return;
 
-        if (seconds === null) return;
-
-        const rankIndex = getRankIndexForTime(seconds, level.times);
+        const rankIndex = getRankIndexForTime(entry.seconds, entry.level.times);
         rankIndices.push(rankIndex);
     });
 
@@ -112,14 +129,11 @@ function getPersonalRankDistribution()
         style: ranksStyles[rankIndex] || { background: "transparent", color: "#ffffff" }
     }));
 
-    table.querySelectorAll(".time-input").forEach(input =>
+    getPersonalTimeEntries().forEach(entry =>
     {
-        const level = getLevelByFlatIndex(Number(input.dataset.levelIndex));
-        const seconds = parseTime(input.value);
+        if (entry.seconds === null) return;
 
-        if (seconds === null) return;
-
-        const rankIndex = getRankIndexForTime(seconds, level.times);
+        const rankIndex = getRankIndexForTime(entry.seconds, entry.level.times);
         counts[rankIndex].count++;
     });
 
