@@ -80,22 +80,26 @@ async function fetchAndUpdateWrTimes()
 /**
  * Finds the fastest WR time from a boss strategy list in alt.json
  * @param {Array} strategies - Strategy entries for a boss
- * @returns {number|null} Best time in seconds, or null if none found
+ * @returns {{ time: number, url: string|null, player: string|null }|null} Best entry or null
  */
 function getBestWrTimeFromStrategies(strategies)
 {
-    let bestTime = null;
+    let best = null;
 
     for (const strategy of strategies) {
         if (!strategy.time || strategy.title) continue;
 
         const time = parseTime(String(strategy.time));
-        if (time !== null && (bestTime === null || time < bestTime)) {
-            bestTime = time;
+        if (time !== null && (best === null || time < best.time)) {
+            best = {
+                time,
+                url: strategy.url || null,
+                player: strategy.player || null
+            };
         }
     }
 
-    return bestTime;
+    return best;
 }
 
 /**
@@ -114,6 +118,101 @@ function updateWrTimesInData(wrData)
 
     if (wrData["DLC C/S"]) {
         updateCategoryTimes("DLC", wrData["DLC C/S"], BOSS_NAME_MAP, "charge");
+    }
+
+    // Calculate fallback rank multipliers based on WR/F ratio after updating times
+    calculateRankMultipliers();
+}
+
+/**
+ * Calculates rank multipliers for a specific category based on WR/F ratios
+ * @param {Object} categoryData - The category object with islands data
+ * @returns {Array} Array of multipliers for each rank
+ */
+function calculateCategoryMultipliers(categoryData)
+{
+    let wrToFratios = [];
+
+    // Collect WR/F ratios from all levels using original fRankTime values
+    if (categoryData.islands) {
+        categoryData.islands.forEach(island => {
+            island.levels.forEach(level => {
+                if (level.fRankTime && level.times && level.times.length >= 19) {
+                    const wrTime = Number.isFinite(level.wrTime) ? level.wrTime : level.times[0];
+                    const fRankTime = level.fRankTime;
+                    if (wrTime > 0 && fRankTime > 0) {
+                        wrToFratios.push(wrTime / fRankTime);
+                    }
+                }
+            });
+        });
+    }
+
+    // Calculate average WR/F ratio
+    if (wrToFratios.length === 0) return null;
+
+    const avgRatio = wrToFratios.reduce((sum, ratio) => sum + ratio, 0) / wrToFratios.length;
+
+    // Generate fallback multipliers from the average WR/F ratio.
+    // Individual levels with a fetched WR are still anchored to their own WR.
+    const multipliers = createRankMultipliers(avgRatio);
+
+    return multipliers;
+}
+
+/**
+ * Calculates rank multipliers for all categories based on the ratio between WR and F rank times
+ * This allows dynamic interpolation of intermediate ranks per category
+ */
+function calculateRankMultipliers()
+{
+    // Calculate multipliers for 1.1+ category
+    const category11 = categories.find(cat => cat.id === "1-1");
+    if (category11 && category11.islands) {
+        const multipliers = calculateCategoryMultipliers(category11);
+        if (multipliers) {
+            category11.rankMultipliers = multipliers;
+            console.log("Calculated 1.1+ rank multipliers:", multipliers);
+            // Regenerate times for 1.1+ with new multipliers
+            regenerateCategoryTimes(category11, multipliers);
+        }
+    }
+
+    // Calculate multipliers for DLC sub-options
+    const dlcCategory = categories.find(cat => cat.id === "DLC");
+    if (dlcCategory && dlcCategory.subOptions) {
+        dlcCategory.subOptions.forEach(subOption => {
+            if (subOption.islands) {
+                const multipliers = calculateCategoryMultipliers(subOption);
+                if (multipliers) {
+                    subOption.rankMultipliers = multipliers;
+                    console.log(`Calculated ${subOption.id} rank multipliers:`, multipliers);
+                    // Regenerate times for this sub-option with new fallback multipliers
+                    regenerateCategoryTimes(subOption, multipliers);
+                }
+            }
+        });
+    }
+}
+
+/**
+ * Regenerates times arrays for a category using new multipliers
+ * @param {Object} categoryData - The category object with islands data
+ * @param {Array} multipliers - The new multipliers to use
+ */
+function regenerateCategoryTimes(categoryData, multipliers)
+{
+    if (categoryData.islands) {
+        categoryData.islands.forEach(island => {
+            island.levels.forEach(level => {
+                if (level.fRankTime) {
+                    level.times = generateRankTimes(level.fRankTime, {
+                        wrTime: level.wrTime,
+                        fallbackMultipliers: multipliers
+                    });
+                }
+            });
+        });
     }
 }
 
@@ -153,13 +252,24 @@ function updateCategoryTimes(categoryId, categoryData, bossNameMap, subOptionId 
 
                 if (!jsonBossKey || !categoryData[jsonBossKey]) return;
 
-                const wrTime = getBestWrTimeFromStrategies(categoryData[jsonBossKey]);
-                if (wrTime === null || !level.times || level.times.length === 0) return;
+                const wrEntry = getBestWrTimeFromStrategies(categoryData[jsonBossKey]);
+                if (wrEntry === null) return;
 
-                const oldWr = level.times[0];
-                const ratio = wrTime / oldWr;
+                const wrTime = wrEntry.time;
 
-                level.times = level.times.map(time => Math.round(time * ratio * 100) / 100);
+                if (!level.times && level.fRankTime) {
+                    level.times = generateRankTimes(level.fRankTime);
+                }
+
+                if (!level.times || level.times.length === 0) return;
+
+                const oldWr = Number.isFinite(level.wrTime) ? level.wrTime : level.times[0];
+                level.wrTime = wrTime;
+                level.wrUrl = wrEntry.url;
+                level.wrPlayer = wrEntry.player;
+                level.times = generateRankTimes(level.fRankTime || level.times[level.times.length - 1], {
+                    wrTime
+                });
                 oldWrSum += oldWr;
                 newWrSum += wrTime;
                 updatedLevelCount++;
@@ -169,17 +279,17 @@ function updateCategoryTimes(categoryId, categoryData, bossNameMap, subOptionId 
         if (updatedLevelCount > 0 && oldWrSum > 0) {
             const totalRatio = newWrSum / oldWrSum;
 
-            if (target.residual?.length) {
+            if (typeof target.residual === 'number') {
+                target.residual = roundTime(target.residual * totalRatio);
+            } else if (target.residual && typeof target.residual === 'object' && !Array.isArray(target.residual)) {
+                // Object residuals have calibrated wrTime/fRankTime values that should NOT be scaled.
+                // They represent independent measurements, not sums derived from boss times.
+            } else if (target.residual?.length) {
                 target.residual = target.residual.map(time =>
-                    Math.round(time * totalRatio * 100) / 100
+                    roundTime(time * totalRatio)
                 );
             }
 
-            if (target.sob?.length) {
-                target.sob = target.sob.map(time =>
-                    Math.round(time * totalRatio * 100) / 100
-                );
-            }
         }
     });
 }

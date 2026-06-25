@@ -48,38 +48,43 @@ body.is-transitioning {
 
 #bigtitle {
     margin: 0;
-    font-family: monospace;
-    font-size: 35px;
-    line-height: 1.2;
+    width: min(800px, 90vw);
+    height: auto;
+    display: block;
 }
 
-a {
+.page-tabs {
+    display: inline-flex;
+    background: #31156f;
+    padding: 4px;
+    border-radius: 12px;
+    gap: 4px;
+    margin-top: 10px;
+}
+
+.page-tabs a {
     color: rgb(183, 169, 245);
-    font-size: 21px;
-    font-weight: 800;
-    display: inline-block;
+    font-size: 18px;
+    font-weight: 700;
     text-decoration: none;
-    background-color: #4A22A8;
-    padding: 4px 10px;
-    border-radius: 8px;
-    transition: background 0.2s ease;
+    padding: 8px 18px;
+    border-radius: 9px;
+    transition: all 0.2s ease;
 }
 
-a:hover {
-    background-color: #5D2CD1;
+.page-tabs a:hover {
+    background: rgba(255,255,255,0.08);
+    color: white;
 }
 
-a.active {
-    background-color: rgb(209, 203, 238);
+.page-tabs a.active {
+    background: rgb(209, 203, 238);
     color: #4A22A8;
-    cursor: default;
     pointer-events: none;
 }
 
-
-a:hover,
-a:focus-visible {
-    color: #ffffff;
+.page-tabs a.active:hover {
+    color: #4A22A8;
 }
 
 .category-tabs {
@@ -577,7 +582,21 @@ th.personal-time-col {
     position: relative;
     display: flex;
     justify-content: center;
+    align-items: center;
     width: 100%;
+    padding: 30px;
+    min-height: 280px;
+}
+
+.rank-chart-pie {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    position: relative;
+    box-shadow:
+        0 0 0 4px #20124d,
+        0 0 0 8px #4a22a8,
+        0 0 20px rgba(74, 34, 168, 0.3);
 }
 
 .rank-chart-tooltip {
@@ -596,6 +615,7 @@ th.personal-time-col {
     font-weight: 600;
 
     white-space: nowrap;
+    max-width: calc(100vw - 40px);
 
     opacity: 0;
     transform: translate(12px, 12px);
@@ -603,6 +623,37 @@ th.personal-time-col {
     transition:
         opacity .12s ease,
         transform .12s ease;
+}
+
+.tooltip-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+    max-width: 200px;
+}
+
+.tooltip-boss-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+[data-tooltip] {
+    cursor: help;
+}
+
+.info-tooltip {
+    background: rgba(20, 18, 77, 0.95);
+    color: #ded8ff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    max-width: 300px;
+    white-space: normal;
+    border: 1px solid #4a22a8;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 
@@ -631,6 +682,57 @@ th.personal-time-col {
 tbody tr:hover td {
     filter: brightness(1.08);
 }
+
+/* ── Info nav button (used on all pages) ────────────────────────── */
+
+.info-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 400;
+    background-color: #4A22A8;
+    color: rgb(183, 169, 245);
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.info-nav-btn:hover {
+    background-color: #5D2CD1;
+    color: #ffffff;
+}
+
+.info-nav-btn.active {
+    background-color: rgb(209, 203, 238);
+    color: #4A22A8;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+
+/* ── WR link in time table ──────────────────────────────────────── */
+
+.wr-link {
+    text-decoration: none;
+    font-weight: inherit;
+    font-size: inherit;
+    border-bottom: 1px dotted currentColor;
+    opacity: 0.9;
+    transition: opacity 0.15s, border-bottom-color 0.15s;
+}
+
+.wr-link:hover {
+    opacity: 1;
+    border-bottom-style: solid;
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
     body {

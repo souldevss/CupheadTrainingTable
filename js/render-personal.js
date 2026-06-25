@@ -1,6 +1,20 @@
 // Personal times page rendering (index.html)
 
 /**
+ * Calculates the brightness of a hex color (0-255)
+ * @param {string} hex - Hex color string (e.g., "#ffffff" or "#fff")
+ * @returns {number} Brightness value (0-255)
+ */
+function getBrightness(hex)
+{
+    const hexValue = hex.replace("#", "");
+    const r = parseInt(hexValue.substr(0, 2), 16);
+    const g = parseInt(hexValue.substr(2, 2), 16);
+    const b = parseInt(hexValue.substr(4, 2), 16);
+    return (r * 299 + g * 587 + b * 114) / 1000;
+}
+
+/**
  * Renders the personal times page with input fields for user's times
  */
 function renderPersonalTimesPage()
@@ -91,9 +105,9 @@ function renderPersonalTimesPage()
             const nextInput = personalInputs[targetIndex];
 
             if (nextInput) {
+                target.dispatchEvent(new Event("blur", { bubbles: true }));
                 nextInput.focus();
                 nextInput.select();
-                nextInput.dispatchEvent(new Event("focus", { bubbles: true }));
             }
         });
 
@@ -106,7 +120,6 @@ function renderPersonalTimesPage()
             if (firstInput) {
                 firstInput.focus();
                 firstInput.select();
-                firstInput.dispatchEvent(new Event("focus", { bubbles: true }));
             }
         });
     }
@@ -175,8 +188,15 @@ function renderPersonalTotals()
         const rankIndex = row.total === null ? null : getRankIndexForTime(row.total, row.thresholds);
         const rankStyle = getInterpolatedRankStyle(row.total, row.thresholds);
 
+        let tooltipAttr = "";
+        if (row.name === "Residual") {
+            tooltipAttr = `data-tooltip="Residuals are the time spent outside from levels, like walking in the map, scorecards, cutscenes etc."`;
+        } else if (row.name === "Sob") {
+            tooltipAttr = `data-tooltip="Sum of all the best times + Residual"`;
+        }
+
         totalsHtml += `
-    <tr>
+    <tr ${tooltipAttr}>
         <td class="island sticky-col-1" style="background: ${rowStyle.background}; color: ${rowStyle.color};">${row.name}</td>
         <td class="personal-time-col" style="background: ${rankStyle.background}; color: ${rankStyle.color};">
             <div class="time-input-wrapper" style="background: transparent !important; justify-content: space-between; padding: 1px 6px;">
@@ -196,6 +216,32 @@ function renderPersonalTotals()
 `;
 
     totals.innerHTML = totalsHtml;
+
+    const tooltipRows = totals.querySelectorAll("[data-tooltip]");
+    const infoTooltip = document.createElement("div");
+    infoTooltip.className = "info-tooltip";
+    infoTooltip.style.position = "fixed";
+    infoTooltip.style.zIndex = "10000";
+    infoTooltip.style.pointerEvents = "none";
+    infoTooltip.style.opacity = "0";
+    infoTooltip.style.transition = "opacity 0.15s ease";
+    document.body.appendChild(infoTooltip);
+
+    tooltipRows.forEach(row => {
+        row.addEventListener("mouseenter", () => {
+            infoTooltip.textContent = row.dataset.tooltip;
+            infoTooltip.style.opacity = "1";
+        });
+
+        row.addEventListener("mousemove", (e) => {
+            infoTooltip.style.left = `${e.clientX + 12}px`;
+            infoTooltip.style.top = `${e.clientY + 12}px`;
+        });
+
+        row.addEventListener("mouseleave", () => {
+            infoTooltip.style.opacity = "0";
+        });
+    });
 }
 
 /**
@@ -263,7 +309,9 @@ function renderRankChart()
         {
             const start = index === 0 ? 0 : displayRanks.slice(0, index).reduce((sum, previous) => sum + (previous.count / filledCount) * 100, 0);
             const end = start + (item.count / filledCount) * 100;
-            return `${item.style.background} ${start.toFixed(2)}% ${end.toFixed(2)}%`;
+            const adjustedStart = Math.max(0, start - 0.1);
+            const adjustedEnd = Math.min(100, end + 0.1);
+            return `${item.style.background} ${adjustedStart.toFixed(2)}% ${adjustedEnd.toFixed(2)}%`;
         }).join(", ");
 
     const pieChartStyle = `background: ${filledCount === 0 ? "transparent" : `conic-gradient(${pieChartSegments})`};`;
@@ -296,17 +344,22 @@ if (rankChartPie) {
         ? ""
         : `
         <div class="rank-chart-pie-wrapper">
-            <div class="rank-chart-pie" style="${pieChartStyle}"></div>
+            <div class="rank-chart-pie" style="${pieChartStyle}">
+                <div class="rank-chart-pie-highlight"></div>
+            </div>
             <div class="rank-chart-tooltip"></div>
         </div>
         `;
 
     if (filledCount > 0) {
         const pie = rankChartPie.querySelector(".rank-chart-pie");
+        const highlight = rankChartPie.querySelector(".rank-chart-pie-highlight");
         const tooltip = rankChartPie.querySelector(".rank-chart-tooltip");
 
         const slices = [];
         let currentAngle = 0;
+        let currentSliceIndex = -1;
+        let cachedTooltipWidth = 0;
 
         displayRanks.forEach(item => {
             const sliceAngle = (item.count / filledCount) * 360;
@@ -315,11 +368,26 @@ if (rankChartPie) {
                 start: currentAngle,
                 end: currentAngle + sliceAngle,
                 rank: formatRankLabel(item.rank),
+                rankIndex: item.rankIndex,
                 percent: Math.round((item.count / filledCount) * 100),
                 color: item.style.background
             });
 
             currentAngle += sliceAngle;
+        });
+
+        highlight.style.position = "absolute";
+        highlight.style.top = "0";
+        highlight.style.left = "0";
+        highlight.style.width = "100%";
+        highlight.style.height = "100%";
+        highlight.style.borderRadius = "50%";
+        highlight.style.opacity = "0";
+        highlight.style.transition = "opacity 0.2s ease, filter 0.2s ease, background 0.2s ease, transform 0.2s ease";
+        highlight.style.pointerEvents = "none";
+
+        pie.addEventListener("mouseenter", () => {
+            pie.style.transition = "transform 0.2s ease, filter 0.2s ease";
         });
 
         pie.addEventListener("mousemove", e => {
@@ -347,23 +415,78 @@ if (rankChartPie) {
 
             if (!slice) {
                 tooltip.style.opacity = "0";
+                highlight.style.opacity = "0";
+                highlight.style.transform = "scale(1)";
+                currentSliceIndex = -1;
+                cachedTooltipWidth = 0;
                 return;
             }
 
-            tooltip.innerHTML = `
-                <span style="color:${slice.color}">
-                    ${slice.rank}
-                </span>
-                • ${slice.percent}%
-            `;
+            const sliceIndex = slices.indexOf(slice);
+
+            if (sliceIndex !== currentSliceIndex) {
+                currentSliceIndex = sliceIndex;
+
+                const brightness = getBrightness(slice.color);
+                const tooltipBg = brightness > 128 ? "rgba(0, 0, 0, 0.85)" : "rgba(255, 255, 255, 0.85)";
+                const tooltipColor = brightness > 128 ? "#fff" : "#000";
+
+                const entries = getPersonalTimeEntries();
+                const matchingLevels = entries.filter(entry => {
+                    if (entry.seconds === null) return false;
+                    const rankIndex = getRankIndexForTime(entry.seconds, entry.level.times);
+                    return rankIndex === slice.rankIndex;
+                });
+
+                const iconsHtml = matchingLevels.length > 0
+                    ? matchingLevels.map(entry => {
+                        const icon = entry.level.icon;
+                        return icon ? `<img src="${icon}" class="tooltip-boss-icon" alt="">` : "";
+                    }).join("")
+                    : "";
+
+                tooltip.innerHTML = `
+                    <span style="color:${slice.color}">
+                        ${slice.rank}
+                    </span>
+                    • ${slice.percent}%
+                    <div class="tooltip-icons">${iconsHtml}</div>
+                `;
+
+                tooltip.style.background = tooltipBg;
+                tooltip.style.color = tooltipColor;
+                tooltip.style.width = "auto";
+                tooltip.style.maxWidth = "calc(100vw - 40px)";
+                tooltip.style.opacity = "0.9";
+
+                const tooltipRect = tooltip.getBoundingClientRect();
+                cachedTooltipWidth = tooltipRect.width;
+                tooltip.style.width = `${cachedTooltipWidth}px`;
+                tooltip.style.maxWidth = `${cachedTooltipWidth}px`;
+
+                const highlightGradient = `conic-gradient(
+                    transparent 0deg ${slice.start}deg,
+                    ${slice.color} ${slice.start}deg ${slice.end}deg,
+                    transparent ${slice.end}deg 360deg
+                )`;
+                highlight.style.background = highlightGradient;
+                highlight.style.opacity = "1";
+                highlight.style.filter = "brightness(1.1)";
+                highlight.style.transform = "scale(1.05)";
+            }
+
+            tooltip.style.opacity = "1";
 
             tooltip.style.left = `${e.clientX}px`;
             tooltip.style.top = `${e.clientY}px`;
-            tooltip.style.opacity = "1";
+            tooltip.style.transform = `translate(-${cachedTooltipWidth + 12}px, 12px)`;
         });
 
         pie.addEventListener("mouseleave", () => {
             tooltip.style.opacity = "0";
+            highlight.style.opacity = "0";
+            highlight.style.transform = "scale(1)";
+            currentSliceIndex = -1;
         });
     }
 }

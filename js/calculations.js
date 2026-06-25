@@ -18,6 +18,11 @@ function getPersonalTimeEntries()
         const value = input.value.trim();
         const seconds = value ? parseTime(value) : parseTime(storedTimes[input.id] || "");
 
+        // Generate times array from fRankTime if not already present
+        if (level && !level.times && level.fRankTime) {
+            level.times = generateRankTimes(level.fRankTime, getActiveRankMultipliers());
+        }
+
         return {
             input,
             level,
@@ -48,19 +53,20 @@ function getPersonalTotalsData()
         });
     });
 
-    const residual = getActiveResidual();
     const averageRankIndex = getAverageRankIndex();
-    if (residual.length > 0 && averageRankIndex !== null) {
+    const residualArray = getResidualRankTimes();
+
+    if (residualArray.length > 0 && averageRankIndex !== null) {
         islandRows.push({
             name: "Residual",
-            total: residual[averageRankIndex],
-            thresholds: residual
+            total: residualArray[averageRankIndex],
+            thresholds: residualArray
         });
-    } else if (residual.length > 0) {
+    } else if (residualArray.length > 0) {
         islandRows.push({
             name: "Residual",
-            total: residual[0],
-            thresholds: residual
+            total: residualArray[0],
+            thresholds: residualArray
         });
     }
 
@@ -68,21 +74,7 @@ function getPersonalTotalsData()
     const hasAllLevelRows = levelRows.every(row => row.total !== null);
     const residualRow = islandRows.find(row => row.name === "Residual");
     const residualTotal = residualRow ? residualRow.total : 0;
-    const activeSob = getActiveSob();
-
-    let sobThresholds;
-    if (activeSob && activeSob.length > 0) {
-        sobThresholds = activeSob;
-    } else {
-        sobThresholds = ranks.map((_, rankIndex) => {
-            const residualValue = residual && residual.length > rankIndex ? residual[rankIndex] : 0;
-            const islandsTotal = getActiveIslands().reduce(
-                (sum, _, islandIndex) => sum + getIslandTotal(islandIndex, rankIndex),
-                0
-            );
-            return residualValue + islandsTotal;
-        });
-    }
+    const sobThresholds = ranks.map((_, rankIndex) => getSobTotal(rankIndex));
 
     islandRows.push({
         name: "Sob",

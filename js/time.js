@@ -17,16 +17,26 @@ function parseTime(value)
         if (parts.length !== 2) return null;
 
         const minutes = Number(parts[0]);
-        const seconds = Number(parts[1]);
+        let seconds = Number(parts[1]);
 
         if (!Number.isFinite(minutes) || !Number.isFinite(seconds)) return null;
         if (minutes < 0 || seconds < 0 || seconds >= 60) return null;
 
+        if (!parts[1].includes(".")) {
+            seconds += 0.5;
+        }
+
         return minutes * 60 + seconds;
     }
 
-    const seconds = Number(cleanValue);
-    return Number.isFinite(seconds) && seconds >= 0 ? seconds : null;
+    let seconds = Number(cleanValue);
+    if (!Number.isFinite(seconds) || seconds < 0) return null;
+
+    if (!cleanValue.includes(".")) {
+        seconds += 0.5;
+    }
+
+    return seconds;
 }
 
 /**
@@ -71,20 +81,26 @@ function matchColumnWidths()
 
     if (tableHeaderCells.length === 0 || totalsHeaderCells.length === 0) return;
 
+    // Sync rank columns (main table index 2+ → totals index 1+)
     let tableIndex = 2;
     let totalsIndex = 1;
 
     while (tableIndex < tableHeaderCells.length && totalsIndex < totalsHeaderCells.length) {
         const width = tableHeaderCells[tableIndex].getBoundingClientRect().width;
-        totalsHeaderCells[totalsIndex].style.minWidth = `${width}px`;
-        totalsHeaderCells[totalsIndex].style.maxWidth = `${width}px`;
+        const th = totalsHeaderCells[totalsIndex];
+        th.style.width = `${width}px`;
+        th.style.minWidth = `${width}px`;
+        th.style.maxWidth = `${width}px`;
         tableIndex++;
         totalsIndex++;
     }
 
+    // Sync first column to island + boss combined width
     const firstIslandWidth = table.querySelector(".island")?.getBoundingClientRect().width || 0;
     const firstBossWidth = table.querySelector(".boss")?.getBoundingClientRect().width || 0;
     const combinedFirstWidth = firstIslandWidth + firstBossWidth;
-    totalsHeaderCells[0].style.minWidth = `${combinedFirstWidth}px`;
-    totalsHeaderCells[0].style.maxWidth = `${combinedFirstWidth}px`;
+    const firstTh = totalsHeaderCells[0];
+    firstTh.style.width = `${combinedFirstWidth}px`;
+    firstTh.style.minWidth = `${combinedFirstWidth}px`;
+    firstTh.style.maxWidth = `${combinedFirstWidth}px`;
 }

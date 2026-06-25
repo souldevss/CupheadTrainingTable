@@ -38,14 +38,31 @@ function getActiveResidual()
     return data?.residual || [];
 }
 
-/**
- * Gets the active sob (sum of best) times based on current category and sub-option
- * @returns {Array|null} Array of sob time values for each rank, or null if not predefined
- */
-function getActiveSob()
+function getResidualRankTimes()
 {
-    const { data } = getActiveCategoryContext();
-    return data?.sob || null;
+    const residual = getActiveResidual();
+
+    if (typeof residual === "number") {
+        return generateRankTimes(residual, getActiveRankMultipliers());
+    }
+
+    if (residual && typeof residual === "object" && !Array.isArray(residual)) {
+        const { fRankTime, wrTime } = residual;
+        if (Number.isFinite(wrTime) && Number.isFinite(fRankTime)) {
+            return generateRankTimes(fRankTime, { wrTime });
+        }
+        if (Number.isFinite(fRankTime)) {
+            return generateRankTimes(fRankTime, getActiveRankMultipliers());
+        }
+    }
+
+    return Array.isArray(residual) ? residual : [];
+}
+
+function getResidualTotal(rankIndex)
+{
+    const residualTimes = getResidualRankTimes();
+    return residualTimes[rankIndex] || 0;
 }
 
 /**
@@ -56,10 +73,14 @@ function getActiveSob()
  */
 function getIslandTotal(islandIndex, rankIndex)
 {
-    return getActiveIslands()[islandIndex].levels.reduce(
-        (sum, boss) => sum + boss.times[rankIndex],
-        0
-    );
+    const multipliers = getActiveRankMultipliers();
+    return getActiveIslands()[islandIndex].levels.reduce((sum, boss) => {
+        // Generate times array from fRankTime if not already present
+        if (!boss.times && boss.fRankTime) {
+            boss.times = generateRankTimes(boss.fRankTime, multipliers);
+        }
+        return sum + (boss.times ? boss.times[rankIndex] : 0);
+    }, 0);
 }
 
 /**
@@ -70,13 +91,12 @@ function getIslandTotal(islandIndex, rankIndex)
  */
 function getSobTotal(rankIndex)
 {
-    const residual = getActiveResidual();
-    const residualValue = residual && residual.length > rankIndex ? residual[rankIndex] : 0;
     const islandsTotal = getActiveIslands().reduce(
         (sum, _, islandIndex) => sum + getIslandTotal(islandIndex, rankIndex),
         0
     );
-    return residualValue + islandsTotal;
+
+    return roundTime(islandsTotal + getResidualTotal(rankIndex));
 }
 
 /**
@@ -105,4 +125,30 @@ function getLevelByFlatIndex(targetIndex)
 function getTotalLevelCount()
 {
     return getActiveIslands().reduce((sum, island) => sum + island.levels.length, 0);
+}
+
+/**
+ * Gets the rank multipliers for the current active category
+ * @returns {Array} Array of multipliers for each rank
+ */
+function getActiveRankMultipliers()
+{
+    const { data } = getActiveCategoryContext();
+    return data?.rankMultipliers || defaultRankMultipliers;
+}
+
+/**
+ * Generates times arrays for all levels that only have fRankTime
+ * This should be called before any rendering to ensure all levels have times data
+ */
+function generateAllLevelTimes()
+{
+    const multipliers = getActiveRankMultipliers();
+    getActiveIslands().forEach(island => {
+        island.levels.forEach(level => {
+            if (!level.times && level.fRankTime) {
+                level.times = generateRankTimes(level.fRankTime, multipliers);
+            }
+        });
+    });
 }

@@ -25,6 +25,11 @@ function renderTimeTablePage()
     for (const island of getActiveIslands()) {
         island.levels.forEach((boss, index) =>
         {
+            // Generate times array from fRankTime if not already present
+            if (!boss.times && boss.fRankTime) {
+                boss.times = generateRankTimes(boss.fRankTime, getActiveRankMultipliers());
+            }
+
             html += "<tr>";
 
             if (index === 0) {
@@ -44,11 +49,22 @@ function renderTimeTablePage()
             boss.times.forEach((time, rankIndex) =>
             {
                 const style = ranksStyles[rankIndex] || { background: "transparent", color: "#ffffff" };
-                html += `
+
+                if (rankIndex === 0 && boss.wrUrl) {
+                    html += `
+            <td class="rank-col rank-0" style="background: ${style.background}; color: ${style.color};">
+                <a class="wr-link" href="${escapeAttribute(boss.wrUrl)}" target="_blank" rel="noopener" title="${escapeAttribute(boss.wrPlayer ? boss.wrPlayer + ' — ' + formatTime(time) : formatTime(time))}" style="color: ${style.color};">
+                    ${formatTime(time)}
+                </a>
+            </td>
+            `;
+                } else {
+                    html += `
             <td class="rank-col rank-${rankIndex}" style="background: ${style.background}; color: ${style.color};">
                 ${formatTime(time)}
             </td>
             `;
+                }
             });
 
             html += "</tr>";
@@ -63,6 +79,7 @@ function renderTimeTablePage()
     table.innerHTML = html;
     renderTimeTableTotals();
 
+    requestAnimationFrame(matchColumnWidths);
     window.addEventListener("load", matchColumnWidths);
     window.addEventListener("resize", matchColumnWidths);
 }
@@ -72,8 +89,6 @@ function renderTimeTablePage()
  */
 function renderTimeTableTotals()
 {
-    const residual = getActiveResidual();
-
     let totalsHtml = `
 <table>
 <thead>
@@ -107,10 +122,12 @@ function renderTimeTableTotals()
     }
 
     const residualStyle = totalsRowsStyles.find(r => r.name === "Residual") || { background: "#333", color: "#fff" };
+    const residualArray = getResidualRankTimes();
+
     totalsHtml += `
-<tr>
+<tr data-tooltip="Residuals are the time spent outside from levels, like walking in the map, scorecards, cutscenes etc.">
     <td class="island sticky-col-1" style="background: ${residualStyle.background}; color: ${residualStyle.color};">Residual</td>
-    ${residual.map((value, rankIndex) =>
+    ${residualArray.map((value, rankIndex) =>
         {
             const style = ranksStyles[rankIndex] || { background: "transparent", color: "#ffffff" };
             return `
@@ -124,13 +141,13 @@ function renderTimeTableTotals()
 `;
 
     const sobStyle = totalsRowsStyles.find(r => r.name === "Sob") || { background: "#333", color: "#fff" };
-    const activeSob = getActiveSob();
+
     totalsHtml += `
-<tr>
+<tr data-tooltip="Sum of all the best times + Residual">
     <td class="island sticky-col-1" style="background: ${sobStyle.background}; color: ${sobStyle.color};">Sob</td>
     ${ranks.map((_, rankIndex) =>
     {
-        const total = (activeSob && activeSob[rankIndex] !== undefined) ? activeSob[rankIndex] : getSobTotal(rankIndex);
+        const total = getSobTotal(rankIndex);
         const style = ranksStyles[rankIndex] || { background: "transparent", color: "#ffffff" };
         return `
         <td class="rank-${rankIndex}" style="background: ${style.background}; color: ${style.color};">
@@ -147,4 +164,34 @@ function renderTimeTableTotals()
 `;
 
     totals.innerHTML = totalsHtml;
+
+    // Set up tooltips for Residual and Sob rows
+    const tooltipRows = totals.querySelectorAll("[data-tooltip]");
+    let infoTooltip = document.querySelector(".info-tooltip");
+    if (!infoTooltip) {
+        infoTooltip = document.createElement("div");
+        infoTooltip.className = "info-tooltip";
+        infoTooltip.style.position = "fixed";
+        infoTooltip.style.zIndex = "10000";
+        infoTooltip.style.pointerEvents = "none";
+        infoTooltip.style.opacity = "0";
+        infoTooltip.style.transition = "opacity 0.15s ease";
+        document.body.appendChild(infoTooltip);
+    }
+
+    tooltipRows.forEach(row => {
+        row.addEventListener("mouseenter", () => {
+            infoTooltip.textContent = row.dataset.tooltip;
+            infoTooltip.style.opacity = "1";
+        });
+
+        row.addEventListener("mousemove", (e) => {
+            infoTooltip.style.left = `${e.clientX + 12}px`;
+            infoTooltip.style.top = `${e.clientY + 12}px`;
+        });
+
+        row.addEventListener("mouseleave", () => {
+            infoTooltip.style.opacity = "0";
+        });
+    });
 }

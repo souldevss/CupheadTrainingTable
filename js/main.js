@@ -26,6 +26,7 @@ async function initializeApp()
     setupPageNavigation();
     renderCategoryControls();
     await fetchAndUpdateWrTimes();
+    generateAllLevelTimes();
     renderActivePage();
     document.body.classList.add("is-ready");
 }
