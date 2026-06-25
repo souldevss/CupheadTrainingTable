@@ -77,10 +77,44 @@ function renderPersonalTimesPage()
     syncAllPersonalRanks();
     renderRankChart();
 
-    table.querySelectorAll(".time-input").forEach(input => {
+    const personalInputs = [...table.querySelectorAll(".time-input")];
+
+    if (personalInputs.length > 0) {
+        table.addEventListener("keydown", event => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement) || !target.classList.contains("time-input")) return;
+            if (event.key !== "Enter" && event.key !== "NumpadEnter") return;
+
+            event.preventDefault();
+            const currentIndex = personalInputs.indexOf(target);
+            const targetIndex = currentIndex >= 0 ? (currentIndex + 1) % personalInputs.length : 0;
+            const nextInput = personalInputs[targetIndex];
+
+            if (nextInput) {
+                nextInput.focus();
+                nextInput.select();
+                nextInput.dispatchEvent(new Event("focus", { bubbles: true }));
+            }
+        });
+
+        document.addEventListener("keydown", event => {
+            if (event.key !== "Enter" && event.key !== "NumpadEnter") return;
+            if (document.activeElement instanceof HTMLInputElement) return;
+
+            event.preventDefault();
+            const firstInput = personalInputs[0];
+            if (firstInput) {
+                firstInput.focus();
+                firstInput.select();
+                firstInput.dispatchEvent(new Event("focus", { bubbles: true }));
+            }
+        });
+    }
+
+    personalInputs.forEach(input => {
         let loopAudio = null;
 
-        const playSelectSound = () => playSound(APP_SOUND_URLS.selection, 0.25);
+        const playSelectSound = () => playSound(APP_SOUND_URLS.selection, 0.15);
 
         const startLoopSound = () => {
             if (loopAudio) {
@@ -89,7 +123,7 @@ function renderPersonalTimesPage()
             }
             loopAudio = new Audio(APP_SOUND_URLS.loop);
             loopAudio.loop = true;
-            loopAudio.volume = 0.2;
+            loopAudio.volume = 0.01;
             loopAudio.play().catch(() => {});
         };
 
@@ -98,7 +132,7 @@ function renderPersonalTimesPage()
                 loopAudio.pause();
                 loopAudio.currentTime = 0;
             }
-            playSound(APP_SOUND_URLS.loopEnd, 0.2);
+            playSound(APP_SOUND_URLS.loopEnd, 0.1);
         };
 
         input.addEventListener("focus", () => {
