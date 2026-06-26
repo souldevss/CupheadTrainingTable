@@ -11,29 +11,23 @@
 <div class="pages">
     <img id="bigtitle" src="assets/bigtitle.png" alt="Cuphead Training Table">
 
-    <div class="nav-row">
-        <div class="page-tabs">
-            <a href="index.html" class="active">Enter Times</a>
-            <a href="index2.html">Time Table</a>
-        </div>
+    <a href="info.html" class="info-nav-btn" aria-label="How it works">&#9432;</a>
 
-        <a href="info.html" class="info-nav-btn" aria-label="How it works">
-            &#9432;
-        </a>
+    <button id="lang-toggle-btn" class="lang-toggle-btn-inline" type="button" onclick="setActiveLanguage(getActiveLanguage() === 'pt-BR' ? 'en' : 'pt-BR')" aria-label="Toggle language">
+        <img src="https://flagcdn.com/w40/us.png" srcset="https://flagcdn.com/w80/us.png 2x" alt="English" width="28" height="21">
+    </button>
+</div>
+
+<div class="nav-row">
+    <div class="page-tabs">
+        <a href="index.html" class="active" data-i18n="nav.enter-times">Enter Times</a>
+        <a href="index2.html" data-i18n="nav.time-table">Time Table</a>
     </div>
 </div>
 
     <div id="category-tabs" class="category-tabs"></div>
 
-    <div class="data-controls">
-        <button id="export-btn" class="data-control-btn" type="button">
-            <span>⬇ Export Times</span>
-        </button>
-        <button id="import-btn" class="data-control-btn" type="button">
-            <span>⬆ Import Times</span>
-        </button>
-        <input id="import-file" type="file" accept=".json" style="display: none;">
-    </div>
+    <input id="import-file" type="file" accept=".json" style="display: none;">
 
     <div class="board-layout">
         <div class="scroll-wrapper">
@@ -44,6 +38,16 @@
             <aside id="rank-chart" class="rank-chart"></aside>
             <div id="rank-chart-pie" class="rank-chart-pie-shell"></div>
         </div>
+    </div>
+
+    <div class="data-controls">
+        <button id="export-btn" class="data-control-btn" type="button" data-i18n="nav.export">
+            <span>⬇ Export Times</span>
+        </button>
+        <button id="import-btn" class="data-control-btn" type="button" data-i18n="nav.import">
+            <span>⬆ Import Times</span>
+        </button>
+        <input id="import-file" type="file" accept=".json" style="display: none;">
     </div>
 
     <script src="data.js"></script>
@@ -58,6 +62,7 @@
     <script src="js/render-time-table.js"></script>
     <script src="js/render-personal.js"></script>
     <script src="js/render.js"></script>
+    <script src="js/language.js"></script>
     <script src="js/main.js"></script>
 
 </body>

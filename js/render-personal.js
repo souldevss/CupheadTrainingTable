@@ -30,8 +30,8 @@ function renderPersonalTimesPage()
 <table class="personal-table">
 <thead>
 <tr>
-    <th class="island sticky-col-1">Islands</th>
-    <th class="boss sticky-col-2">Levels</th>
+    <th class="island sticky-col-1">${t("header.islands")}</th>
+    <th class="boss sticky-col-2">${t("header.levels")}</th>
     <th class="personal-time-col"></th>
 </tr>
 </thead>
@@ -175,7 +175,7 @@ function renderPersonalTotals()
 <table class="personal-totals-table">
 <thead>
 <tr>
-    <th class="island sticky-col-1">Total Times</th>
+    <th class="island sticky-col-1">${t("header.total")}</th>
     <th class="personal-time-col"></th>
 </tr>
 </thead>
@@ -190,9 +190,9 @@ function renderPersonalTotals()
 
         let tooltipAttr = "";
         if (row.name === "Residual") {
-            tooltipAttr = `data-tooltip="Residuals are the time spent outside from levels, like walking in the map, scorecards, cutscenes etc."`;
+            tooltipAttr = `data-tooltip="${escapeAttribute(t("tooltip.residual"))}"`;
         } else if (row.name === "Sob") {
-            tooltipAttr = `data-tooltip="Sum of all the best times + Residual"`;
+            tooltipAttr = `data-tooltip="${escapeAttribute(t("tooltip.sob"))}"`;
         }
 
         totalsHtml += `
@@ -319,7 +319,7 @@ function renderRankChart()
     rankChart.innerHTML = `
     <div class="rank-chart-header">
         <div>
-            <h2>Rank Distribution</h2>
+            <h2>${t("personal.rank-distribution")}</h2>
             <span>${filledCount}/${totalCount} times</span>
         </div>
     </div>
@@ -504,16 +504,16 @@ function renderPlaceholderTable()
         <table>
             <thead>
                 <tr>
-                    <th>Section</th>
-                    <th>Status</th>
-                    <th>Times</th>
+                    <th>${t("personal.placeholder.section")}</th>
+                    <th>${t("personal.placeholder.status")}</th>
+                    <th>${t("personal.placeholder.times")}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>${activeCategory.label}</td>
-                    <td>Placeholder</td>
-                    <td>Coming soon</td>
+                    <td>${t("personal.placeholder.label")}</td>
+                    <td>${t("personal.placeholder.coming")}</td>
                 </tr>
             </tbody>
         </table>

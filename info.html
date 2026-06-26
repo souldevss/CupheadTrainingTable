@@ -12,15 +12,17 @@
 <div class="pages">
     <img id="bigtitle" src="assets/bigtitle.png" alt="Cuphead Training Table">
 
-    <div class="nav-row">
-        <div class="page-tabs">
-            <a href="index.html">Enter Times</a>
-            <a href="index2.html">Time Table</a>
-        </div>
+    <a href="info.html" class="info-nav-btn active-info" aria-label="How it works">&#9432;</a>
 
-        <a href="info.html" class="info-nav-btn active-info" aria-label="How it works">
-            &#9432;
-        </a>
+    <button id="lang-toggle-btn" class="lang-toggle-btn-inline" type="button" onclick="setActiveLanguage(getActiveLanguage() === 'pt-BR' ? 'en' : 'pt-BR')" aria-label="Toggle language">
+        <img src="https://flagcdn.com/w40/us.png" srcset="https://flagcdn.com/w80/us.png 2x" alt="English" width="28" height="21">
+    </button>
+</div>
+
+<div class="nav-row">
+    <div class="page-tabs">
+        <a href="index.html" data-i18n="nav.enter-times">Enter Times</a>
+        <a href="index2.html" data-i18n="nav.time-table">Time Table</a>
     </div>
 </div>
 
@@ -29,15 +31,15 @@
         <section class="info-section">
 
 
-            <h2>What the fork is this website</h2>
-            <p>
+            <h2 data-i18n-content="info.what-title">What the fork is this website</h2>
+            <p data-i18n-content="info.what-text">
                 This is a personal practice tracker for Cuphead main category speedruns. Enter your best times per level, see your rank on each fight, and track your Sum of Bests (SoB) across the run.
             </p>
         </section>
 
         <section class="info-section">
-            <h2>Ranks</h2>
-            <p>Each level has 19 thresholds, from fastest to slowest:</p>
+            <h2 data-i18n-content="info.ranks-title">Ranks</h2>
+            <p data-i18n-content="info.ranks-intro">Each level has 19 thresholds, from fastest to slowest:</p>
             <div class="info-ranks">
                 <span class="info-rank-badge" style="background:#ffffff;color:#000000;">WR</span>
                 <span class="info-rank-badge" style="background:#252525;color:#F1C232;">S</span>
@@ -59,28 +61,28 @@
                 <span class="info-rank-badge" style="background:#E06666;color:#000000;">E-</span>
                 <span class="info-rank-badge" style="background:#999999;color:#000000;">F</span>
             </div>
-            <p>
+            <p data-i18n-content="info.ranks-text">
                 The rank thresholds are based on the current WR for each IL and made-up F rank times.
             </p>
         </section>
 
         <section class="info-section">
-            <h2>Distribution Curve</h2>
-            <p>
+            <h2 data-i18n-content="info.distribution-title">Distribution Curve</h2>
+            <p data-i18n-content="info.distribution-text">
                 Each rank threshold is computed as:
             </p>
             <div class="info-formula">
                 threshold(i) = WR + (F &minus; WR) &times; (i&thinsp;/&thinsp;18)<sup>1.35</sup>
             </div>
             <p>
-                where <strong>i</strong> is the rank index (0&thinsp;=&thinsp;WR, 18&thinsp;=&thinsp;F).
-                The exponent controls how the 19 thresholds are spread between WR and F:
+                <span data-i18n-content="info.distribution.explain-i">where <strong>i</strong> is the rank index (0&thinsp;=&thinsp;WR, 18&thinsp;=&thinsp;F).
+                The exponent controls how the 19 thresholds are spread between WR and F:</span>
             </p>
             <ul>
-                <li><strong>= 1.0 (linear)</strong> — equal gap between every consecutive rank.</li>
-                <li><strong>&gt; 1.0 (used here: 1.35)</strong> — thresholds cluster near WR; gaps grow toward F. Improving from F to D is easier than from S to WR.</li>
+                <li data-i18n-content="info.distribution.linear-desc"><strong>= 1.0 (linear)</strong> — equal gap between every consecutive rank.</li>
+                <li data-i18n-content="info.distribution.power-desc"><strong>&gt; 1.0 (used here: 1.35)</strong> — thresholds cluster near WR; gaps grow toward F. Improving from F to D is easier than from S to WR.</li>
             </ul>
-            <p>The graph below shows how the curve maps rank index to the fraction of the WR&rarr;F range used for each threshold. Tick marks on the axis show where each rank falls.</p>
+            <p data-i18n-content="info.distribution.graph-desc">The graph below shows how the curve maps rank index to the fraction of the WR&rarr;F range used for each threshold. Tick marks on the axis show where each rank falls.</p>
             <div class="info-graph-wrap">
                 <canvas id="curve-graph" width="680" height="260"></canvas>
             </div>
@@ -89,6 +91,7 @@
     </div>
 
     <script src="js/main-nav.js"></script>
+    <script src="js/language.js"></script>
     <script src="js/info-graph.js"></script>
 
 </body>

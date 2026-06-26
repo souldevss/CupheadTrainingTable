@@ -14,8 +14,8 @@ function renderTimeTablePage()
 <table>
 <thead>
 <tr>
-    <th class="island sticky-col-1">Islands</th>
-    <th class="boss sticky-col-2">Levels</th>
+    <th class="island sticky-col-1">${t("header.islands")}</th>
+    <th class="boss sticky-col-2">${t("header.levels")}</th>
     ${ranks.map(rank => `<th class="rank-col">${rank}</th>`).join("")}
 </tr>
 </thead>
@@ -93,7 +93,7 @@ function renderTimeTableTotals()
 <table>
 <thead>
 <tr>
-    <th class="island sticky-col-1">Isle Times</th>
+    <th class="island sticky-col-1">${t("header.isle-times")}</th>
     ${ranks.map(rank => `<th class="rank-col">${rank}</th>`).join("")}
 </tr>
 </thead>
@@ -125,8 +125,8 @@ function renderTimeTableTotals()
     const residualArray = getResidualRankTimes();
 
     totalsHtml += `
-<tr data-tooltip="Residuals are the time spent outside from levels, like walking in the map, scorecards, cutscenes etc.">
-    <td class="island sticky-col-1" style="background: ${residualStyle.background}; color: ${residualStyle.color};">Residual</td>
+<tr data-tooltip="${escapeAttribute(t("tooltip.residual"))}">
+    <td class="island sticky-col-1" style="background: ${residualStyle.background}; color: ${residualStyle.color};">${t("header.residual")}</td>
     ${residualArray.map((value, rankIndex) =>
         {
             const style = ranksStyles[rankIndex] || { background: "transparent", color: "#ffffff" };
@@ -143,8 +143,8 @@ function renderTimeTableTotals()
     const sobStyle = totalsRowsStyles.find(r => r.name === "Sob") || { background: "#333", color: "#fff" };
 
     totalsHtml += `
-<tr data-tooltip="Sum of all the best times + Residual">
-    <td class="island sticky-col-1" style="background: ${sobStyle.background}; color: ${sobStyle.color};">Sob</td>
+<tr data-tooltip="${escapeAttribute(t("tooltip.sob"))}">
+    <td class="island sticky-col-1" style="background: ${sobStyle.background}; color: ${sobStyle.color};">${t("header.sob")}</td>
     ${ranks.map((_, rankIndex) =>
     {
         const total = getSobTotal(rankIndex);

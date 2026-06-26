@@ -117,7 +117,12 @@ function updateWrTimesInData(wrData)
     }
 
     if (wrData["DLC C/S"]) {
-        updateCategoryTimes("DLC", wrData["DLC C/S"], BOSS_NAME_MAP, "charge");
+        // Some bosses (Forest Follies, Mausoleum, Esther Winchester) don't have
+        // Charge-specific entries in alt.json. Fall back to Lobber data for them.
+        const chargeData = wrData["DLC C/S"];
+        const lobberFallback = wrData["DLC L/S"] || {};
+        const mergedData = { ...lobberFallback, ...chargeData };
+        updateCategoryTimes("DLC", mergedData, BOSS_NAME_MAP, "charge");
     }
 
     // Calculate fallback rank multipliers based on WR/F ratio after updating times
