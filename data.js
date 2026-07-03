@@ -10,19 +10,19 @@ const ranksStyles = [
     { background: "#d88d6f", color: "#000000" },
     { background: "#f1cb79", color: "#000000" },
     { background: "#fffab2", color: "#000000" },
-    { background: "#7980F7", color: "#000000" },
-    { background: "#A2A7FE", color: "#000000" },
     { background: "#D9D2E9", color: "#000000" },
-    { background: "#6C9CE8", color: "#000000" },
-    { background: "#84AFE6", color: "#000000" },
+    { background: "#A2A7FE", color: "#000000" },
+    { background: "#7980F7", color: "#000000" },
     { background: "#9FC5E8", color: "#000000" },
-    { background: "#41a777", color: "#000000" },
-    { background: "#74b390", color: "#000000" },
-    { background: "#99c99f", color: "#000000" },
-    { background: "#E06666", color: "#000000" },
-    { background: "#DD7E6B", color: "#000000" },
+    { background: "#84AFE6", color: "#000000" },
+    { background: "#6C9CE8", color: "#000000" },
+    { background: "#A0C2C7", color: "#000000" },
+    { background: "#8CB5BC", color: "#000000" },
+    { background: "#76A5AF", color: "#000000" },
     { background: "#EA9999", color: "#000000" },
-    { background: "#a7a7a7", color: "#000000" }
+    { background: "#DD7E6B", color: "#000000" },
+    { background: "#E06666", color: "#000000" },
+    { background: "#999999", color: "#000000" }
 ];
 
 const DEFAULT_WR_TO_F_RATIO = 0.723;
