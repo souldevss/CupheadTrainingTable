@@ -7,28 +7,14 @@ function playSound(url, volume = 0.2)
     audio.play().catch(() => {});
 }
 
-function setupPageNavigation(transitionDelay = 200)
-{
-    document.querySelectorAll("a[data-page-link]").forEach(link => {
-        link.addEventListener("click", event => {
-            event.preventDefault();
-            document.body.classList.add("is-transitioning");
-            playSound(APP_SOUND_URLS.selection, 0.2);
-            window.setTimeout(() => {
-                window.location.href = link.getAttribute("href");
-            }, transitionDelay);
-        });
-    });
-}
-
 async function initializeApp()
 {
-    setupPageNavigation();
     renderCategoryControls();
-    await fetchAndUpdateWrTimes();
+    if (activeGame === "cuphead") {
+        await fetchAndUpdateWrTimes();
+    }
     generateAllLevelTimes();
     renderActivePage();
-    document.body.classList.add("is-ready");
 }
 
 activeCategory = getInitialCategory();

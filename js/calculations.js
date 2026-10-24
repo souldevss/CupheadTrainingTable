@@ -20,7 +20,10 @@ function getPersonalTimeEntries()
 
         // Generate times array from fRankTime if not already present
         if (level && !level.times && level.fRankTime) {
-            level.times = generateRankTimes(level.fRankTime, getActiveRankMultipliers());
+            level.times = generateRankTimes(level.fRankTime, {
+                wrTime: level.wrTime,
+                fallbackMultipliers: getActiveRankMultipliers()
+            });
         }
 
         return {
@@ -34,6 +37,16 @@ function getPersonalTimeEntries()
 function getPersonalTotalsData()
 {
     const entries = getPersonalTimeEntries();
+    if (activeGame === "hollow-knight") {
+        const hasAllTimes = entries.length === getActiveLevels().length
+            && entries.every(entry => entry.seconds !== null);
+        return [{
+            name: "Total",
+            total: hasAllTimes ? roundTime(entries.reduce((sum, entry) => sum + entry.seconds, 0)) : null,
+            thresholds: getActiveLevelRankTotals()
+        }];
+    }
+
     const islandRows = [];
     let entryIndex = 0;
 
@@ -118,7 +131,7 @@ function getPersonalRankDistribution()
         rank,
         rankIndex,
         count: 0,
-        style: ranksStyles[rankIndex] || { background: "transparent", color: "#ffffff" }
+        style: getRankStyle(rankIndex)
     }));
 
     getPersonalTimeEntries().forEach(entry =>

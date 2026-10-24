@@ -4,7 +4,7 @@ function createBossCellMarkup(boss)
 {
     const iconMarkup = boss.icon ? `<img src="${boss.icon}" class="boss-icon" alt="">` : "";
     return `
-        <td class="boss" style="background: ${boss.background || "#ffffff"}; color: ${boss.color || "#000000"};">
+        <td class="boss ${activeGame === "hollow-knight" ? "split-cell" : ""}" style="background: ${boss.background || "#ffffff"}; color: ${boss.color || "#000000"};">
             <div class="boss-content">
                 ${iconMarkup}
                 <span>${escapeAttribute(boss.name || "")}</span>
@@ -23,4 +23,5 @@ function renderActivePage()
     } else {
         renderTimeTablePage();
     }
+
 }

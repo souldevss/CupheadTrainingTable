@@ -11,12 +11,13 @@
 
 <div class="pages">
     <img id="bigtitle" src="assets/bigtitle.png" alt="Cuphead Training Table">
-
+    <h1 id="hollow-knight-title" hidden>Hollow Knight Training Table</h1>
     <a href="info.html" class="info-nav-btn active-info" aria-label="How it works">&#9432;</a>
 
     <button id="lang-toggle-btn" class="lang-toggle-btn-inline" type="button" onclick="setActiveLanguage(getActiveLanguage() === 'pt-BR' ? 'en' : 'pt-BR')" aria-label="Toggle language">
         <img src="https://flagcdn.com/w40/us.png" srcset="https://flagcdn.com/w80/us.png 2x" alt="English" width="28" height="21">
     </button>
+    <button id="game-toggle-btn" class="game-toggle-btn" type="button"></button>
 </div>
 
 <div class="nav-row">
@@ -33,7 +34,7 @@
 
             <h2 data-i18n-content="info.what-title">What the fork is this website</h2>
             <p data-i18n-content="info.what-text">
-                This is a personal practice tracker for Cuphead main category speedruns. Enter your best times per level, see your rank on each fight, and track your Sum of Bests (SoB) across the run.
+                This is a personal practice tracker for speedruns. Enter your best times for each level or split, see your rank, and track your progress.
             </p>
         </section>
 
@@ -90,7 +91,7 @@
 
     </div>
 
-    <script src="js/main-nav.js"></script>
+    <script src="js/game-toggle.js"></script>
     <script src="js/language.js"></script>
     <script src="js/info-graph.js"></script>
 

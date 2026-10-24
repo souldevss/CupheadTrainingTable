@@ -28,6 +28,19 @@ function getActiveIslands()
     return data?.islands || [];
 }
 
+function getActiveLevels()
+{
+    const { data } = getActiveCategoryContext();
+    return data?.levels || getActiveIslands().flatMap(island => island.levels);
+}
+
+function getActiveLevelRankTotals()
+{
+    return ranks.map((_, rankIndex) =>
+        roundTime(getActiveLevels().reduce((sum, level) => sum + (level.times?.[rankIndex] || 0), 0))
+    );
+}
+
 /**
  * Gets the active residual times based on current category and sub-option
  * @returns {Array} Array of residual time values for each rank
@@ -106,16 +119,7 @@ function getSobTotal(rankIndex)
  */
 function getLevelByFlatIndex(targetIndex)
 {
-    let currentIndex = 0;
-
-    for (const island of getActiveIslands()) {
-        for (const level of island.levels) {
-            if (currentIndex === targetIndex) return level;
-            currentIndex++;
-        }
-    }
-
-    return getActiveIslands()[0].levels[0];
+    return getActiveLevels()[targetIndex] || getActiveLevels()[0];
 }
 
 /**
@@ -124,7 +128,7 @@ function getLevelByFlatIndex(targetIndex)
  */
 function getTotalLevelCount()
 {
-    return getActiveIslands().reduce((sum, island) => sum + island.levels.length, 0);
+    return getActiveLevels().length;
 }
 
 /**
@@ -144,11 +148,12 @@ function getActiveRankMultipliers()
 function generateAllLevelTimes()
 {
     const multipliers = getActiveRankMultipliers();
-    getActiveIslands().forEach(island => {
-        island.levels.forEach(level => {
-            if (!level.times && level.fRankTime) {
-                level.times = generateRankTimes(level.fRankTime, multipliers);
-            }
-        });
+    getActiveLevels().forEach(level => {
+        if (!level.times && level.fRankTime) {
+            level.times = generateRankTimes(level.fRankTime, {
+                wrTime: level.wrTime,
+                fallbackMultipliers: multipliers
+            });
+        }
     });
 }

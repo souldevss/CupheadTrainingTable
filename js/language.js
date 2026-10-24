@@ -20,10 +20,10 @@ const TRANSLATIONS = {
 
         // Info page
         "info.what-title": "What the fork is this website",
-        "info.what-text": "This is a personal practice tracker for Cuphead main category speedruns. Log your best times per level, see your rank on each fight, and track your Sum of Bests (SoB) across the run.",
+        "info.what-text": "This is a personal practice tracker for speedruns. Enter your best times for each level or split, see your rank, and track your progress.",
         "info.ranks-title": "Ranks",
         "info.ranks-intro": "Each level has 19 thresholds, from fastest to slowest:",
-        "info.ranks-text": "The rank thresholds are based on the current WR for each IL and made-up F rank times.",
+        "info.ranks-text": "Rank thresholds are based on the configured WR and F rank times for each level or split.",
         "info.distribution-title": "Distribution Curve",
         "info.distribution-text": "Each rank threshold is computed as:",
         "info.distribution.formula-wr": "WR time (rank 0)",
@@ -79,10 +79,10 @@ const TRANSLATIONS = {
 
         // Info page
         "info.what-title": "Que resenha é essa",
-        "info.what-text": "Isso aqui é um rastreador pessoal de prática para speedruns de Cuphead nas categorias principais. Registre seus melhores tempos por nível, veja seu rank em cada um e acompanhe sua Soma de Melhores (SoB) ao longo da run.",
+        "info.what-text": "Este é um rastreador pessoal de prática para speedruns. Registre seus melhores tempos por nível ou split, veja seu rank e acompanhe seu progresso.",
         "info.ranks-title": "Ranks",
         "info.ranks-intro": "Cada nível tem 19 limiares, do mais rápido ao mais lento:",
-        "info.ranks-text": "Os limiares de rank são baseados no WR atual de cada IL e tempos de rank F inventados.",
+        "info.ranks-text": "Os limites de rank usam os tempos WR e F configurados para cada nível ou split.",
         "info.distribution-title": "Curva de Distribuição",
         "info.distribution-text": "Cada limiar de rank é calculado como:",
         "info.distribution.formula-wr": "tempo WR (rank 0)",
@@ -149,7 +149,10 @@ function applyLanguage(lang)
 
     // Update page title
     const isInfoPage = document.body.dataset.page === "info";
-    document.title = isInfoPage ? t("page.title.info") : t("page.title");
+    const isHollowKnight = localStorage.getItem("trainingTableGame") === "hollow-knight";
+    document.title = isHollowKnight
+        ? "Hollow Knight Training Table"
+        : isInfoPage ? t("page.title.info") : t("page.title");
 
     // Swap bigtitle image
     const bigtitle = document.getElementById("bigtitle");
@@ -158,6 +161,7 @@ function applyLanguage(lang)
             ? "assets/bigtitle_pt-br.png"
             : "assets/bigtitle_en.png";
         bigtitle.alt = t("bigtitle.alt");
+        bigtitle.hidden = isHollowKnight;
     }
 
     // Translate nav links with data-i18n
@@ -184,13 +188,13 @@ function applyLanguage(lang)
         const img = langBtn.querySelector("img");
         if (img) {
             if (lang === "pt-BR") {
-                img.src = "https://flagcdn.com/w40/br.png";
-                img.srcset = "https://flagcdn.com/w80/br.png 2x";
-                img.alt = "Português";
-            } else {
                 img.src = "https://flagcdn.com/w40/us.png";
                 img.srcset = "https://flagcdn.com/w80/us.png 2x";
-                img.alt = "English";
+                img.alt = "Switch to English";
+            } else {
+                img.src = "https://flagcdn.com/w40/br.png";
+                img.srcset = "https://flagcdn.com/w80/br.png 2x";
+                img.alt = "Mudar para português";
             }
         }
     }
@@ -202,12 +206,12 @@ function applyLanguage(lang)
     }
 
     // Re-render table on time table page
-    if (document.body.dataset.page === "time-table" && typeof renderTimeTable === "function") {
+    if (typeof activeCategory !== "undefined" && activeCategory && document.body.dataset.page === "time-table" && typeof renderTimeTable === "function") {
         renderTimeTable();
     }
 
     // Re-render personal times page
-    if (document.body.dataset.page === "personal-times" && typeof renderPersonalTimesPage === "function") {
+    if (typeof activeCategory !== "undefined" && activeCategory && document.body.dataset.page === "personal-times" && typeof renderPersonalTimesPage === "function") {
         renderPersonalTimesPage();
     }
 }

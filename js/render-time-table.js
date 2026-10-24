@@ -5,70 +5,75 @@
  */
 function renderTimeTablePage()
 {
-    if (!activeCategory.islands && !activeCategory.subOptions) {
+    if (!getActiveLevels().length) {
         renderPlaceholderTable();
         return;
     }
 
+    const hasIslands = activeGame === "cuphead";
     let html = `
 <table>
 <thead>
 <tr>
-    <th class="island sticky-col-1">${t("header.islands")}</th>
-    <th class="boss sticky-col-2">${t("header.levels")}</th>
+    ${hasIslands ? `<th class="island sticky-col-1">${t("header.islands")}</th>` : ""}
+    <th class="boss ${hasIslands ? "sticky-col-2" : "split-cell"}">${hasIslands ? t("header.levels") : "Split"}</th>
     ${ranks.map(rank => `<th class="rank-col">${rank}</th>`).join("")}
 </tr>
 </thead>
 <tbody>
 `;
 
-    for (const island of getActiveIslands()) {
-        island.levels.forEach((boss, index) =>
-        {
-            // Generate times array from fRankTime if not already present
-            if (!boss.times && boss.fRankTime) {
-                boss.times = generateRankTimes(boss.fRankTime, getActiveRankMultipliers());
-            }
+    const renderLevelRow = (boss, island = null, index = 0) =>
+    {
+        if (!boss.times && boss.fRankTime) {
+            boss.times = generateRankTimes(boss.fRankTime, {
+                wrTime: boss.wrTime,
+                fallbackMultipliers: getActiveRankMultipliers()
+            });
+        }
 
-            html += "<tr>";
-
-            if (index === 0) {
-                html += `
-            <td
-                rowspan="${island.levels.length}"
-                class="island"
-                style="background:${island.color}; color:${island.textcolor};"
-            >
+        html += "<tr>";
+        if (island && index === 0) {
+            html += `
+            <td rowspan="${island.levels.length}" class="island" style="background:${island.color}; color:${island.textcolor};">
                 ${island.name}
-            </td>
-            `;
-            }
+            </td>`;
+        }
 
-            html += createBossCellMarkup(boss);
-
-            boss.times.forEach((time, rankIndex) =>
-            {
-                const style = ranksStyles[rankIndex] || { background: "transparent", color: "#ffffff" };
-
-                if (rankIndex === 0 && boss.wrUrl) {
-                    html += `
-            <td class="rank-col rank-0" style="background: ${style.background}; color: ${style.color};">
-                <a class="wr-link" href="${escapeAttribute(boss.wrUrl)}" target="_blank" rel="noopener" title="${escapeAttribute(boss.wrPlayer ? boss.wrPlayer + ' — ' + formatTime(time) : formatTime(time))}" style="color: ${style.color};">
+        html += createBossCellMarkup(boss);
+        boss.times.forEach((time, rankIndex) =>
+        {
+            const style = getRankStyle(rankIndex);
+            const fontWeight = style.fontWeight || "inherit";
+            if (rankIndex === 0 && boss.wrUrl) {
+                html += `
+            <td class="rank-col rank-0" style="background: ${style.background}; color: ${style.color}; font-weight: ${fontWeight};">
+                <a class="wr-link" href="${escapeAttribute(boss.wrUrl)}" target="_blank" rel="noopener" title="${escapeAttribute(boss.wrPlayer ? boss.wrPlayer + ' — ' + formatTime(time) : formatTime(time))}" style="color: ${style.color}; font-weight: ${fontWeight};">
                     ${formatTime(time)}
                 </a>
-            </td>
-            `;
-                } else {
-                    html += `
-            <td class="rank-col rank-${rankIndex}" style="background: ${style.background}; color: ${style.color};">
-                ${formatTime(time)}
-            </td>
-            `;
-                }
-            });
-
-            html += "</tr>";
+            </td>`;
+            } else {
+                html += `<td class="rank-col rank-${rankIndex}" style="background: ${style.background}; color: ${style.color}; font-weight: ${fontWeight};">${formatTime(time)}</td>`;
+            }
         });
+        html += "</tr>";
+    };
+
+    if (hasIslands) {
+        for (const island of getActiveIslands()) {
+            island.levels.forEach((boss, index) => renderLevelRow(boss, island, index));
+        }
+    } else {
+        getActiveLevels().forEach(boss => renderLevelRow(boss));
+        const totalTimes = getActiveLevelRankTotals();
+        html += `
+<tr class="hollow-knight-total-row">
+    <th class="split-cell total-label">Total</th>
+    ${totalTimes.map((time, rankIndex) => {
+        const style = getRankStyle(rankIndex);
+        return `<td class="rank-col rank-${rankIndex}" style="background: ${style.background}; color: ${style.color}; font-weight: ${style.fontWeight || "inherit"};">${formatTime(time)}</td>`;
+    }).join("")}
+</tr>`;
     }
 
     html += `
@@ -77,7 +82,13 @@ function renderTimeTablePage()
 `;
 
     table.innerHTML = html;
-    renderTimeTableTotals();
+    if (hasIslands) {
+        totals.hidden = false;
+        renderTimeTableTotals();
+    } else {
+        totals.innerHTML = "";
+        totals.hidden = true;
+    }
 
     requestAnimationFrame(matchColumnWidths);
     window.addEventListener("load", matchColumnWidths);
@@ -110,9 +121,9 @@ function renderTimeTableTotals()
         ${ranks.map((_, rankIndex) =>
         {
             const total = getIslandTotal(i, rankIndex);
-            const style = ranksStyles[rankIndex] || { background: "transparent", color: "#ffffff" };
+            const style = getRankStyle(rankIndex);
             return `
-            <td class="rank-${rankIndex}" style="background: ${style.background}; color: ${style.color};">
+            <td class="rank-${rankIndex}" style="background: ${style.background}; color: ${style.color}; font-weight: ${style.fontWeight || "inherit"};">
                 ${formatTime(total)}
             </td>
             `;
@@ -129,9 +140,9 @@ function renderTimeTableTotals()
     <td class="island sticky-col-1" style="background: ${residualStyle.background}; color: ${residualStyle.color};">${t("header.residual")}</td>
     ${residualArray.map((value, rankIndex) =>
         {
-            const style = ranksStyles[rankIndex] || { background: "transparent", color: "#ffffff" };
+            const style = getRankStyle(rankIndex);
             return `
-            <td class="rank-${rankIndex}" style="background: ${style.background}; color: ${style.color};">
+            <td class="rank-${rankIndex}" style="background: ${style.background}; color: ${style.color}; font-weight: ${style.fontWeight || "inherit"};">
                 ${formatTime(value)}
             </td>
             `;
@@ -148,9 +159,9 @@ function renderTimeTableTotals()
     ${ranks.map((_, rankIndex) =>
     {
         const total = getSobTotal(rankIndex);
-        const style = ranksStyles[rankIndex] || { background: "transparent", color: "#ffffff" };
+        const style = getRankStyle(rankIndex);
         return `
-        <td class="rank-${rankIndex}" style="background: ${style.background}; color: ${style.color};">
+        <td class="rank-${rankIndex}" style="background: ${style.background}; color: ${style.color}; font-weight: ${style.fontWeight || "inherit"};">
             ${formatTime(total)}
         </td>
         `;

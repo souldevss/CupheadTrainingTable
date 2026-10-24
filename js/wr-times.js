@@ -139,19 +139,16 @@ function calculateCategoryMultipliers(categoryData)
     let wrToFratios = [];
 
     // Collect WR/F ratios from all levels using original fRankTime values
-    if (categoryData.islands) {
-        categoryData.islands.forEach(island => {
-            island.levels.forEach(level => {
-                if (level.fRankTime && level.times && level.times.length >= 19) {
-                    const wrTime = Number.isFinite(level.wrTime) ? level.wrTime : level.times[0];
-                    const fRankTime = level.fRankTime;
-                    if (wrTime > 0 && fRankTime > 0) {
-                        wrToFratios.push(wrTime / fRankTime);
-                    }
-                }
-            });
-        });
-    }
+    const levels = categoryData.levels || categoryData.islands?.flatMap(island => island.levels) || [];
+    levels.forEach(level => {
+        if (level.fRankTime && level.times && level.times.length >= 19) {
+            const wrTime = Number.isFinite(level.wrTime) ? level.wrTime : level.times[0];
+            const fRankTime = level.fRankTime;
+            if (wrTime > 0 && fRankTime > 0) {
+                wrToFratios.push(wrTime / fRankTime);
+            }
+        }
+    });
 
     // Calculate average WR/F ratio
     if (wrToFratios.length === 0) return null;
@@ -207,18 +204,15 @@ function calculateRankMultipliers()
  */
 function regenerateCategoryTimes(categoryData, multipliers)
 {
-    if (categoryData.islands) {
-        categoryData.islands.forEach(island => {
-            island.levels.forEach(level => {
-                if (level.fRankTime) {
-                    level.times = generateRankTimes(level.fRankTime, {
-                        wrTime: level.wrTime,
-                        fallbackMultipliers: multipliers
-                    });
-                }
+    const levels = categoryData.levels || categoryData.islands?.flatMap(island => island.levels) || [];
+    levels.forEach(level => {
+        if (level.fRankTime) {
+            level.times = generateRankTimes(level.fRankTime, {
+                wrTime: level.wrTime,
+                fallbackMultipliers: multipliers
             });
-        });
-    }
+        }
+    });
 }
 
 /**

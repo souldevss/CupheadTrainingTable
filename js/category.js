@@ -15,7 +15,10 @@ function setActiveCategorySelection(nextCategoryId, nextSubOptionId = null)
         ? (nextSubOptionId || localStorage.getItem("cupheadDlcSubOption") || "lobber")
         : null;
 
-    localStorage.setItem("cupheadSpeedrunCategory", activeCategory.id);
+    localStorage.setItem(
+        activeGame === "hollow-knight" ? "hollowKnightSpeedrunCategory" : "cupheadSpeedrunCategory",
+        activeCategory.id
+    );
 
     if (activeCategory.id === "DLC") {
         localStorage.setItem("cupheadDlcSubOption", activeSubOption || "lobber");
@@ -28,7 +31,13 @@ function setActiveCategorySelection(nextCategoryId, nextSubOptionId = null)
 
 function getInitialCategory()
 {
-    const storedCategoryId = localStorage.getItem("cupheadSpeedrunCategory");
+    const storedCategoryId = localStorage.getItem(
+        activeGame === "hollow-knight" ? "hollowKnightSpeedrunCategory" : "cupheadSpeedrunCategory"
+    );
+
+    if (activeGame === "hollow-knight") {
+        return categories.find(category => category.id === storedCategoryId) || categories[0];
+    }
 
     if (storedCategoryId === "version-1-1") {
         localStorage.setItem("cupheadSpeedrunCategory", "1-1");

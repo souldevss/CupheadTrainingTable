@@ -19,34 +19,34 @@ function getBrightness(hex)
  */
 function renderPersonalTimesPage()
 {
-    if (!activeCategory.islands && !activeCategory.subOptions) {
+    if (!getActiveLevels().length) {
         renderPlaceholderTable();
         return;
     }
 
     const storedTimes = getStoredPersonalTimes();
     let levelCounter = 0;
+    const hasIslands = activeGame === "cuphead";
     let html = `
 <table class="personal-table">
 <thead>
 <tr>
-    <th class="island sticky-col-1">${t("header.islands")}</th>
-    <th class="boss sticky-col-2">${t("header.levels")}</th>
+    ${hasIslands ? `<th class="island sticky-col-1">${t("header.islands")}</th>` : ""}
+    <th class="boss ${hasIslands ? "sticky-col-2" : "split-cell"}">${hasIslands ? t("header.levels") : "Split"}</th>
     <th class="personal-time-col"></th>
 </tr>
 </thead>
 <tbody>
 `;
 
-    for (const island of getActiveIslands()) {
-        island.levels.forEach((boss, index) =>
+    const renderLevelRow = (boss, island = null, index = 0) =>
         {
             const inputId = `personal-time-${levelCounter}`;
             const rowStyle = getPersonalRankStyle(null);
 
             html += "<tr>";
 
-            if (index === 0) {
+            if (island && index === 0) {
                 html += `
             <td
                 rowspan="${island.levels.length}"
@@ -78,7 +78,14 @@ function renderPersonalTimesPage()
 
             html += "</tr>";
             levelCounter++;
-        });
+        };
+
+    if (hasIslands) {
+        for (const island of getActiveIslands()) {
+            island.levels.forEach((boss, index) => renderLevelRow(boss, island, index));
+        }
+    } else {
+        getActiveLevels().forEach(boss => renderLevelRow(boss));
     }
 
     html += `
@@ -170,7 +177,31 @@ function renderPersonalTimesPage()
  */
 function renderPersonalTotals()
 {
+    totals.hidden = false;
     const totalsData = getPersonalTotalsData();
+    if (activeGame === "hollow-knight") {
+        const row = totalsData[0];
+        const rankIndex = row.total === null ? null : getRankIndexForTime(row.total, row.thresholds);
+        const rankStyle = getInterpolatedRankStyle(row.total, row.thresholds);
+        totals.innerHTML = `
+<table class="personal-totals-table hollow-knight-personal-total">
+<tbody>
+    <tr class="hollow-knight-total-row">
+        <th class="total-label">Total</th>
+        <td class="personal-time-col" style="background: ${rankStyle.background}; color: ${rankStyle.color};">
+            <div class="time-input-wrapper total-time-wrapper">
+                <span>${row.total === null ? "-" : formatTime(row.total)}</span>
+                <span class="time-rank-display" style="background: ${rankStyle.background}; color: ${rankStyle.color};">
+                    ${rankIndex === null ? "-" : ranks[rankIndex]}
+                </span>
+            </div>
+        </td>
+    </tr>
+</tbody>
+</table>`;
+        return;
+    }
+
     let totalsHtml = `
 <table class="personal-totals-table">
 <thead>
@@ -294,7 +325,7 @@ function renderRankChart()
             const percent = Math.round((item.count / filledCount) * 100);
             return `
             <div class="rank-chart-row" title="${formatRankLabel(item.rank)}: ${item.count}">
-                <span class="rank-chart-badge" style="background: ${item.style.background}; color: ${item.style.color};">${item.rank}</span>
+                <span class="rank-chart-badge" style="background: ${item.style.background}; color: ${item.style.color}; font-weight: ${item.style.fontWeight || "inherit"};">${item.rank}</span>
                 <div class="rank-chart-track">
                     <span style="width: ${percent}%; background: ${item.style.background};"></span>
                 </div>

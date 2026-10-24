@@ -12,6 +12,34 @@ function getRankIndexForTime(seconds, thresholds)
     return rankIndex === -1 ? ranks.length - 1 : rankIndex;
 }
 
+const hollowKnightRankStyles = [
+    { background: "#eef3f8", color: "#17212b" },
+    { background: "#bce1f1", color: "#947615", fontWeight: "900" },
+    { background: "#368f9c", color: "#f3fbfc" },
+    { background: "#347d8e", color: "#f1f8fa" },
+    { background: "#3e7186", color: "#f0f6f8" },
+    { background: "#476a7c", color: "#f0f5f7" },
+    { background: "#526579", color: "#f1f4f7" },
+    { background: "#665f78", color: "#f4f1f7" },
+    { background: "#775b76", color: "#f7eff5" },
+    { background: "#87556f", color: "#f8eef3" },
+    { background: "#945467", color: "#faedf0" },
+    { background: "#99565b", color: "#fbefed" },
+    { background: "#8c4d50", color: "#f8ecea" },
+    { background: "#76474d", color: "#f4e9e9" },
+    { background: "#62414a", color: "#f0e7eb" },
+    { background: "#513b49", color: "#ece5ed" },
+    { background: "#403643", color: "#e8e4ec" },
+    { background: "#302d3a", color: "#e3e2ec" },
+    { background: "#171923", color: "#e5cbd5" }
+];
+
+function getRankStyle(rankIndex)
+{
+    const styles = activeGame === "hollow-knight" ? hollowKnightRankStyles : ranksStyles;
+    return styles[rankIndex] || { background: "transparent", color: "#ffffff" };
+}
+
 /**
  * Gets the styling for a personal rank display
  * @param {number|null} rankIndex - The rank index or null if no rank
@@ -20,10 +48,13 @@ function getRankIndexForTime(seconds, thresholds)
 function getPersonalRankStyle(rankIndex)
 {
     if (rankIndex === null) {
-        return { background: "#11092c", color: "#ffffff" };
+        return {
+            background: activeGame === "hollow-knight" ? "#111824" : "#11092c",
+            color: "#ffffff"
+        };
     }
 
-    return ranksStyles[rankIndex] || { background: "transparent", color: "#ffffff" };
+    return getRankStyle(rankIndex);
 }
 
 /**
@@ -81,18 +112,21 @@ function interpolateColor(color1, color2, factor)
 function getInterpolatedRankStyle(seconds, thresholds)
 {
     if (seconds === null) {
-        return { background: "#11092c", color: "#ffffff" };
+        return {
+            background: activeGame === "hollow-knight" ? "#111824" : "#11092c",
+            color: "#ffffff"
+        };
     }
 
     const rankIndex = thresholds.findIndex(threshold => seconds <= threshold);
     const currentRankIndex = rankIndex === -1 ? ranks.length - 1 : rankIndex;
 
     if (currentRankIndex === 0 && seconds <= thresholds[0]) {
-        return ranksStyles[0] || { background: "transparent", color: "#ffffff" };
+        return getRankStyle(0);
     }
 
     if (currentRankIndex === ranks.length - 1) {
-        return ranksStyles[ranks.length - 1] || { background: "transparent", color: "#ffffff" };
+        return getRankStyle(ranks.length - 1);
     }
 
     const currentThreshold = thresholds[currentRankIndex];
@@ -107,8 +141,8 @@ function getInterpolatedRankStyle(seconds, thresholds)
             ? rawFactor * 0.6
             : 0.4 + (rawFactor - 0.5) * 0.6;
 
-    const currentStyle = ranksStyles[currentRankIndex] || { background: "transparent", color: "#ffffff" };
-    const previousStyle = ranksStyles[currentRankIndex - 1] || { background: "transparent", color: "#ffffff" };
+    const currentStyle = getRankStyle(currentRankIndex);
+    const previousStyle = getRankStyle(currentRankIndex - 1);
 
     const interpolatedBackground = interpolateColor(
         currentStyle.background || "#000000",
@@ -122,7 +156,11 @@ function getInterpolatedRankStyle(seconds, thresholds)
         factor
     );
 
-    return { background: interpolatedBackground, color: interpolatedTextColor };
+    return {
+        background: interpolatedBackground,
+        color: interpolatedTextColor,
+        ...(currentRankIndex === 1 ? { fontWeight: "900" } : {})
+    };
 }
 
 /**
@@ -159,10 +197,14 @@ function syncPersonalRank(input)
     rankOutput.classList.toggle("personal-rank-empty", rankIndex === null);
     rankOutput.style.background = style.background;
     rankOutput.style.color = style.color;
+    rankOutput.style.fontWeight = style.fontWeight || "";
 
     if (seconds !== null) {
         wrapper.style.setProperty("background", style.background, "important");
-        input.style.setProperty("color", style.color, "important");
+        const inputTextColor = activeGame === "hollow-knight" && rankIndex === 1
+            ? "#17212b"
+            : style.color;
+        input.style.setProperty("color", inputTextColor, "important");
         input.style.setProperty("border-color", style.background, "important");
     } else {
         wrapper.style.removeProperty("background");

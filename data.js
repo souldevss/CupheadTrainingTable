@@ -244,3 +244,30 @@ const speedrunCategories = [
         ]
     }
 ];
+
+const hollowKnightCategories = [
+    {
+        id: "rafters-route",
+        label: "Rafters Route",
+        title: "Rafters Route",
+        levels: [
+            { name: "Vengeful Spirit", icon: "assets/icons/hollowknightsplits/Vengeful Spirit.png", color: "#b7c9e8", wrTime: 205.83, fRankTime: 222 },
+            { name: "Greenpath Entry", icon: "assets/icons/hollowknightsplits/Greenpath.png", color: "#a9d6a1", wrTime: 100.25, fRankTime: 113 },
+            { name: "Mothwing Cloak", icon: "assets/icons/hollowknightsplits/Mothwing Cloak.png", color: "#b6d7ed", wrTime: 141.37, fRankTime: 165 },
+            { name: "Mantis Claw", icon: "assets/icons/hollowknightsplits/Mantis Claw.png", color: "#c8b9e8", wrTime: 93.52, fRankTime: 109 },
+            { name: "Enter Blue Lake", icon: "assets/icons/hollowknightsplits/Enter Blue Lake.png", color: "#9ed9e6", wrTime: 118.75, fRankTime: 139 },
+            { name: "Dream Nail", icon: "assets/icons/hollowknightsplits/Dream Nail.png", color: "#d2c0ed", wrTime: 85.11, fRankTime: 98 },
+            { name: "Chandelier", icon: "assets/icons/hollowknightsplits/Chandelier.png", color: "#f0d69a", wrTime: 128.74, fRankTime: 150 },
+            { name: "Watcher Knights", icon: "assets/icons/hollowknightsplits/Watcher Knights.png", color: "#d9b7c4", wrTime: 67.01, fRankTime: 130 },
+            { name: "Rafters Entry", icon: "assets/icons/hollowknightsplits/Lance Sentry.png", color: "#c5c2e9", wrTime: 93.88, fRankTime: 113.5 },
+            { name: "Lantern", icon: "assets/icons/hollowknightsplits/Lumafly Lantern.png", color: "#f4df8d", wrTime: 99.81, fRankTime: 120 },
+            { name: "Crystal Heart", icon: "assets/icons/hollowknightsplits/Crystal Heart.png", color: "#a4e1e7", wrTime: 113.58, fRankTime: 140 },
+            { name: "Uumuu", icon: "assets/icons/hollowknightsplits/Uumuu.png", color: "#9dddc4", wrTime: 116.56, fRankTime: 160 },
+            { name: "Queen's Gardens", icon: "assets/icons/hollowknightsplits/Queen's Gardens.png", color: "#b6dcaa", wrTime: 94.5, fRankTime: 116.5 },
+            { name: "Trap Bench", icon: "assets/icons/hollowknightsplits/Trap Bench.png", color: "#e2b7bd", wrTime: 115.03, fRankTime: 139 },
+            { name: "Herrah", icon: "assets/icons/hollowknightsplits/Herrah.png", color: "#d3b2dc", wrTime: 63.38, fRankTime: 90 },
+            { name: "Scream", icon: "assets/icons/hollowknightsplits/Scream.png", color: "#e8a8a2", wrTime: 92.31, fRankTime: 100 },
+            { name: "The Hollow Knight", icon: "assets/icons/hollowknightsplits/The Hollow Knight.png", color: "#e1e6ee", wrTime: 87.54, fRankTime: 115 }
+        ]
+    }
+];
