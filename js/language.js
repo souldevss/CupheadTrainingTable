@@ -295,13 +295,13 @@ const TRANSLATIONS = {
         "ui.switch-to-portuguese": "Mudar para português",
 
         // Bigtitle alt text
-        "bigtitle.alt": "Cuphead Training App",
+        "bigtitle.alt": "App de treino de Cuphead",
 
         // Page title
-        "page.title": "Cuphead Training App",
-        "page.title.info": "Cuphead Training App — Info",
-        "page.title.backups": "Cuphead Training App — Backups",
-        "page.title.attempts": "Cuphead Training App — Registro de tentativas",
+        "page.title": "App de treino de Cuphead",
+        "page.title.info": "App de treino de Cuphead — Informações",
+        "page.title.backups": "App de treino de Cuphead — Cópias de segurança",
+        "page.title.attempts": "App de treino de Cuphead — Registro de tentativas",
 
         // Info page
         "info.what-title": "Que resenha é essa",
@@ -612,7 +612,7 @@ function applyLanguage(lang)
         : document.body.dataset.page === "attempt-log" ? t("page.title.attempts")
         : t("page.title");
 
-    // Keep the product name consistent across languages.
+    // Update the visible heading.
     const bigtitle = document.getElementById("bigtitle");
     if (bigtitle) bigtitle.textContent = t("bigtitle.alt");
 
