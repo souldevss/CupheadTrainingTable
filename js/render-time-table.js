@@ -10,13 +10,13 @@ function renderTimeTablePage()
         return;
     }
 
-    const hasIslands = activeGame === "cuphead";
+    const hasIslands = true;
     let html = `
 <table>
 <thead>
 <tr>
     ${hasIslands ? `<th class="island sticky-col-1">${t("header.islands")}</th>` : ""}
-    <th class="boss ${hasIslands ? "sticky-col-2" : "split-cell"}">${hasIslands ? t("header.levels") : "Split"}</th>
+    <th class="boss ${hasIslands ? "sticky-col-2" : "split-cell"}">${hasIslands ? t("header.levels") : t("personal.split")}</th>
     ${ranks.map(rank => `<th class="rank-col">${rank}</th>`).join("")}
 </tr>
 </thead>
@@ -35,7 +35,7 @@ function renderTimeTablePage()
         html += "<tr>";
         if (island && index === 0) {
             html += `
-            <td rowspan="${island.levels.length}" class="island" style="background:${island.color}; color:${island.textcolor};">
+            <td rowspan="${island.levels.length}" class="island isle-artwork" style="background-color:${island.color}; color:${island.textcolor}; ${isleArtworkStyle(island.name, island.color)}">
                 ${island.name}
             </td>`;
         }
@@ -63,17 +63,6 @@ function renderTimeTablePage()
         for (const island of getActiveIslands()) {
             island.levels.forEach((boss, index) => renderLevelRow(boss, island, index));
         }
-    } else {
-        getActiveLevels().forEach(boss => renderLevelRow(boss));
-        const totalTimes = getActiveLevelRankTotals();
-        html += `
-<tr class="hollow-knight-total-row">
-    <th class="split-cell total-label">Total</th>
-    ${totalTimes.map((time, rankIndex) => {
-        const style = getRankStyle(rankIndex);
-        return `<td class="rank-col rank-${rankIndex}" style="background: ${style.background}; color: ${style.color}; font-weight: ${style.fontWeight || "inherit"};">${formatTime(time)}</td>`;
-    }).join("")}
-</tr>`;
     }
 
     html += `
@@ -85,9 +74,6 @@ function renderTimeTablePage()
     if (hasIslands) {
         totals.hidden = false;
         renderTimeTableTotals();
-    } else {
-        totals.innerHTML = "";
-        totals.hidden = true;
     }
 
     requestAnimationFrame(matchColumnWidths);
@@ -117,7 +103,7 @@ function renderTimeTableTotals()
         const rowStyle = totalsRowsStyles.find(r => r.name === activeIslands[i].name) || { background: "#333", color: "#fff" };
         totalsHtml += `
     <tr>
-        <td class="island sticky-col-1" style="background: ${rowStyle.background}; color: ${rowStyle.color};">${activeIslands[i].name}</td>
+        <td class="island sticky-col-1 isle-artwork" style="background-color: ${rowStyle.background}; color: ${rowStyle.color}; ${isleArtworkStyle(activeIslands[i].name, rowStyle.background)}">${activeIslands[i].name}</td>
         ${ranks.map((_, rankIndex) =>
         {
             const total = getIslandTotal(i, rankIndex);

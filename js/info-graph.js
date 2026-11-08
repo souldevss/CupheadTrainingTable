@@ -1,24 +1,13 @@
 // Draws the time-distribution curve graph on the info page canvas
 
 (function () {
-    const ranks = [
-        "WR", "S", "A++", "A+", "A", "A-",
-        "B+", "B", "B-",
-        "C+", "C", "C-",
-        "D+", "D", "D-",
-        "E+", "E", "E-", "F"
-    ];
+    const rankColors = ranksStyles.map(style => style.background);
+    document.querySelector(".info-ranks").innerHTML = ranks.map((rank, index) => {
+        const { background, color } = ranksStyles[index];
+        return '<span class="info-rank-badge" style="background:' + background + ';color:' + color + '">' + rank + '</span>';
+    }).join("");
 
-    const rankColors = [
-        "#ffffff", "#252525", "#9e4058", "#d88d6f", "#f1cb79", "#fffab2",
-        "#D9D2E9", "#A2A7FE", "#7980F7",
-        "#9FC5E8", "#84AFE6", "#6C9CE8",
-        "#A0C2C7", "#8CB5BC", "#76A5AF",
-        "#EA9999", "#DD7E6B", "#E06666",
-        "#999999"
-    ];
-
-    const EXP = 1.35;
+    const EXP = RANK_TIME_CURVE_EXPONENT;
     const N   = ranks.length - 1; // 18
 
     const canvas = document.getElementById("curve-graph");
@@ -142,18 +131,14 @@
         ctx.fillStyle = "rgba(200,200,200,0.55)";
         ctx.font      = "11px sans-serif";
         ctx.textAlign = "center";
-        const xLabel = getActiveLanguage() === "pt-BR"
-            ? "Rank  (WR \u2192 F)"
-            : "Rank  (WR \u2192 F)";
+        const xLabel = t("info.distribution.graph-x-axis");
         ctx.fillText(xLabel, gx(0.5), H - 4);
 
         ctx.save();
         ctx.translate(10, gy(0.5));
         ctx.rotate(-Math.PI / 2);
         ctx.textAlign = "center";
-        const yLabel = getActiveLanguage() === "pt-BR"
-            ? "Posi\u00e7\u00e3o do limiar"
-            : "Threshold position";
+        const yLabel = t("info.distribution.graph-y-axis");
         ctx.fillText(yLabel, 0, 0);
         ctx.restore();
     }

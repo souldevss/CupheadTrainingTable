@@ -68,6 +68,10 @@
     font-family: monospace;
 }
 
+.backup-controls { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top:14px; }
+.backup-controls .data-control-btn { margin:0; }
+#backup-status { color:#c0c7cf; font-size:13px; }
+
 .info-ranks {
     display: flex;
     flex-wrap: wrap;

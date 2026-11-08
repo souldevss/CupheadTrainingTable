@@ -4,25 +4,25 @@ const ranks = [
 ];
 
 const ranksStyles = [
-    { background: "#ffffff", color: "#000000" },
-    { background: "#252525", color: "#F1C232" },
-    { background: "#9e4058", color: "#eaf8fd" },
-    { background: "#d88d6f", color: "#000000" },
-    { background: "#f1cb79", color: "#000000" },
-    { background: "#fffab2", color: "#000000" },
-    { background: "#7980F7", color: "#000000" },
-    { background: "#A2A7FE", color: "#000000" },
-    { background: "#b6b8dd", color: "#000000" },
-    { background: "#6C9CE8", color: "#000000" },
-    { background: "#84AFE6", color: "#000000" },
-    { background: "#9FC5E8", color: "#000000" },
-    { background: "#41a777", color: "#000000" },
-    { background: "#74b390", color: "#000000" },
-    { background: "#99c99f", color: "#000000" },
-    { background: "#E06666", color: "#000000" },
-    { background: "#DD7E6B", color: "#000000" },
-    { background: "#EA9999", color: "#000000" },
-    { background: "#a7a7a7", color: "#000000" }
+    { background: "#fffdf5", color: "#161219" },
+    { background: "#fff8d7", color: "#805400" },
+    { background: "#ffe99a", color: "#161219" },
+    { background: "#ffd36e", color: "#161219" },
+    { background: "#ffb65e", color: "#161219" },
+    { background: "#f69861", color: "#161219" },
+    { background: "#f48380", color: "#161219" },
+    { background: "#ed73a0", color: "#161219" },
+    { background: "#e27dbe", color: "#161219" },
+    { background: "#d185db", color: "#161219" },
+    { background: "#b18ae6", color: "#161219" },
+    { background: "#968fe9", color: "#161219" },
+    { background: "#829deb", color: "#161219" },
+    { background: "#76b0e7", color: "#161219" },
+    { background: "#67bfd8", color: "#161219" },
+    { background: "#65c7b5", color: "#161219" },
+    { background: "#78c47d", color: "#161219" },
+    { background: "#92a63b", color: "#161219" },
+    { background: "#746568", color: "#ffffff" }
 ];
 
 const DEFAULT_WR_TO_F_RATIO = 0.723;
@@ -104,13 +104,28 @@ const totalsRowsStyles = [
     { name: "Sob", background: "#1d595e", color: "#faeb69" }
 ];
 
+const isleImages = new Map([
+    ["Inkwell Isle I", "ch-inkwell-isle-one.webp"],
+    ["Inkwell Isle 1", "ch-inkwell-isle-one.webp"],
+    ["Inkwell Isle II", "isle 2.jpg"],
+    ["Inkwell Isle III", "isle 3.png"],
+    ["Inkwell Hell", "hell.png"]
+]);
+
+function isleArtworkStyle(name, tone) {
+    const file = isleImages.get(name);
+    if (!file) return "";
+    const tint = `color-mix(in srgb, ${tone} 72%, transparent)`;
+    return `background-image:linear-gradient(${tint},${tint}),url('assets/Isles/${encodeURIComponent(file)}');`;
+}
+
 const islands = [
 {
     name: "Inkwell Isle I",
     color: "#a7c8cf",
     textcolor: "#20124d",
     levels: [
-        { name: "Forest Follies", icon: "https://myekul.com/shared-assets/cuphead/images/runnguns/forestfollies.png", background: "#95BC7A", color: "#000000", fRankTime: 44 },
+        { name: "Forest Follies", icon: "https://myekul.com/shared-assets/cuphead/images/runnguns/forestfollies.png", background: "#95BC7A", color: "#000000", wrTime: 32.63, wrUrl: "https://www.youtube.com/live/13ZSnTYvuGA?t=7173", wrPlayer: "SBDWolf", fRankTime: 44 },
         { name: "The Root Pack", icon: "https://myekul.com/shared-assets/cuphead/images/therootpack.png", background: "#DDA13A", color: "#000000", fRankTime: 44.5 },
         { name: "Ribby & Croaks", icon: "https://myekul.com/shared-assets/cuphead/images/ribbyandcroaks.png", background: "#8A8600", color: "#FFFFFF", fRankTime: 67 },
         { name: "Goopy Le Grande", icon: "https://myekul.com/shared-assets/cuphead/images/goopylegrande.png", background: "#5A88D8", color: "#000000", fRankTime: 41 },
@@ -161,8 +176,8 @@ const lobberDlcIslands = [
     color: "#a7c8cf",
     textcolor: "#20124d",
     levels: [
-        { name: "Forest Follies", icon: "https://myekul.com/shared-assets/cuphead/images/runnguns/forestfollies.png", background: "#95BC7A", color: "#000000", fRankTime: 45 },
-        { name: "Mausoleum", icon:"https://myekul.com/shared-assets/cuphead/images/other/mausoleum.png", background: "#6b5f8f", color: "#ffffff", fRankTime: 51 }
+        { name: "Forest Follies", icon: "https://myekul.com/shared-assets/cuphead/images/runnguns/forestfollies.png", background: "#95BC7A", color: "#000000", wrTime: 33.27, wrUrl: "https://youtu.be/q6M5TBPLKps", wrPlayer: "GamerAttack27", fRankTime: 45 },
+        { name: "Mausoleum", wrTime: 47.26, wrUrl: "https://youtu.be/ro73lUU8jjQ", wrPlayer: "ExclamationMarkYT", icon:"https://myekul.com/shared-assets/cuphead/images/other/mausoleum.png", background: "#6b5f8f", color: "#ffffff", fRankTime: 51 }
     ]
 },
 {
@@ -180,7 +195,7 @@ const lobberDlcIslands = [
 }
 ];
 
-const version11Residual = { wrTime: 661.65, fRankTime: 710 };
+const version11Residual = { wrTime: 661.65, fRankTime: 695 };
 
 const lobberDlcResidual = { wrTime: 250.83, fRankTime: 270 };
 
@@ -190,8 +205,8 @@ const chargeDlcIslands = [
     color: "#a7c8cf",
     textcolor: "#20124d",
     levels: [
-        { name: "Forest Follies", icon: "https://myekul.com/shared-assets/cuphead/images/runnguns/forestfollies.png", background: "#95BC7A", color: "#000000", fRankTime: 45 },
-        { name: "Mausoleum", icon:"https://myekul.com/shared-assets/cuphead/images/other/mausoleum.png", background: "#6b5f8f", color: "#ffffff", fRankTime: 51 }
+        { name: "Forest Follies", icon: "https://myekul.com/shared-assets/cuphead/images/runnguns/forestfollies.png", background: "#95BC7A", color: "#000000", wrTime: 33.27, wrUrl: "https://youtu.be/q6M5TBPLKps", wrPlayer: "GamerAttack27", fRankTime: 45 },
+        { name: "Mausoleum", wrTime: 47.26, wrUrl: "https://youtu.be/ro73lUU8jjQ", wrPlayer: "ExclamationMarkYT", icon:"https://myekul.com/shared-assets/cuphead/images/other/mausoleum.png", background: "#6b5f8f", color: "#ffffff", fRankTime: 51 }
     ]
 },
 {
@@ -241,33 +256,6 @@ const speedrunCategories = [
                 residual: chargeDlcResidual,
                 rankMultipliers: [...defaultRankMultipliers]
             }
-        ]
-    }
-];
-
-const hollowKnightCategories = [
-    {
-        id: "rafters-route",
-        label: "Rafters Route",
-        title: "Rafters Route",
-        levels: [
-            { name: "Vengeful Spirit", icon: "assets/icons/hollowknightsplits/Vengeful Spirit.png", color: "#b7c9e8", wrTime: 205.83, fRankTime: 222 },
-            { name: "Greenpath Entry", icon: "assets/icons/hollowknightsplits/Greenpath.png", color: "#a9d6a1", wrTime: 100.25, fRankTime: 113 },
-            { name: "Mothwing Cloak", icon: "assets/icons/hollowknightsplits/Mothwing Cloak.png", color: "#b6d7ed", wrTime: 141.37, fRankTime: 165 },
-            { name: "Mantis Claw", icon: "assets/icons/hollowknightsplits/Mantis Claw.png", color: "#c8b9e8", wrTime: 93.52, fRankTime: 109 },
-            { name: "Enter Blue Lake", icon: "assets/icons/hollowknightsplits/Enter Blue Lake.png", color: "#9ed9e6", wrTime: 118.75, fRankTime: 139 },
-            { name: "Dream Nail", icon: "assets/icons/hollowknightsplits/Dream Nail.png", color: "#d2c0ed", wrTime: 85.11, fRankTime: 98 },
-            { name: "Chandelier", icon: "assets/icons/hollowknightsplits/Chandelier.png", color: "#f0d69a", wrTime: 128.74, fRankTime: 150 },
-            { name: "Watcher Knights", icon: "assets/icons/hollowknightsplits/Watcher Knights.png", color: "#d9b7c4", wrTime: 67.01, fRankTime: 130 },
-            { name: "Rafters Entry", icon: "assets/icons/hollowknightsplits/Lance Sentry.png", color: "#c5c2e9", wrTime: 93.88, fRankTime: 113.5 },
-            { name: "Lantern", icon: "assets/icons/hollowknightsplits/Lumafly Lantern.png", color: "#f4df8d", wrTime: 99.81, fRankTime: 120 },
-            { name: "Crystal Heart", icon: "assets/icons/hollowknightsplits/Crystal Heart.png", color: "#a4e1e7", wrTime: 113.58, fRankTime: 140 },
-            { name: "Uumuu", icon: "assets/icons/hollowknightsplits/Uumuu.png", color: "#9dddc4", wrTime: 116.56, fRankTime: 160 },
-            { name: "Queen's Gardens", icon: "assets/icons/hollowknightsplits/Queen's Gardens.png", color: "#b6dcaa", wrTime: 94.5, fRankTime: 116.5 },
-            { name: "Trap Bench", icon: "assets/icons/hollowknightsplits/Trap Bench.png", color: "#e2b7bd", wrTime: 115.03, fRankTime: 139 },
-            { name: "Herrah", icon: "assets/icons/hollowknightsplits/Herrah.png", color: "#d3b2dc", wrTime: 63.38, fRankTime: 90 },
-            { name: "Scream", icon: "assets/icons/hollowknightsplits/Scream.png", color: "#e8a8a2", wrTime: 92.31, fRankTime: 100 },
-            { name: "The Hollow Knight", icon: "assets/icons/hollowknightsplits/The Hollow Knight.png", color: "#e1e6ee", wrTime: 87.54, fRankTime: 115 }
         ]
     }
 ];

@@ -1,9 +1,11 @@
-# CupheadTrainingTable
-Cool TrainingTable for speedrunners!
-You can access it in https://souldevss.github.io/CupheadTrainingTable/
+# Cuphead Training Table
 
-Use the game icon in the top-right corner to switch between the Cuphead tables and the Hollow Knight Rafters Route table.
-Hollow Knight WR and F rank times are configured locally in `data.js`; they are not fetched from myekul.com.
+The browser edition of Cuphead Training App. Open the [online table](https://souldevss.github.io/CupheadTrainingTable/).
 
+Enter your best times for each boss in **Enter Times** and compare them with rank targets in **Time Table**. Times are saved in your browser and can be imported or exported as JSON. Both pages use the desktop rank colors and island artwork.
 
-It was inspired by the celeste training table > https://docs.google.com/spreadsheets/d/1WwqnaloO6I4gHcyzF3odz6n5LnSDTveS34BY-ljORuI/edit?usp=drivesdk
+Live game tracking and Compact mode are available in the [Windows app](https://github.com/souldevss/CupheadTrainingApp/releases/latest).
+
+Background artwork is from the [original Myekul site](https://github.com/myekul/myekul.github.io/blob/d204591c6e7962e0f054c52950b4ceef45fb1a12/bg.png).
+
+Inspired by the [Celeste training table](https://docs.google.com/spreadsheets/d/1WwqnaloO6I4gHcyzF3odz6n5LnSDTveS34BY-ljORuI/edit?usp=drivesdk).

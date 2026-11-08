@@ -6,9 +6,6 @@
  */
 function getPersonalTimesStorageKey()
 {
-    if (activeGame === "hollow-knight") {
-        return `hollowKnightPersonalTimes:${activeCategory.id}`;
-    }
     if (activeCategory.id === "DLC" && activeSubOption) {
         return `cupheadPersonalTimes:${activeCategory.id}:${activeSubOption}`;
     }
@@ -100,7 +97,7 @@ function exportPersonalTimes()
     const exportData = {
         version: "1.0",
         exportDate: new Date().toISOString(),
-        game: activeGame,
+        game: "cuphead",
         categories: {}
     };
 
@@ -111,9 +108,7 @@ function exportPersonalTimes()
                 subOptions: {}
             };
             category.subOptions.forEach(subOption => {
-                const storageKey = activeGame === "hollow-knight"
-                    ? `hollowKnightPersonalTimes:${category.id}:${subOption.id}`
-                    : `cupheadPersonalTimes:${category.id}:${subOption.id}`;
+                const storageKey = `cupheadPersonalTimes:${category.id}:${subOption.id}`;
                 const times = readStorageJson(storageKey, {});
                 exportData.categories[category.id].subOptions[subOption.id] = {
                     label: subOption.label,
@@ -121,9 +116,7 @@ function exportPersonalTimes()
                 };
             });
         } else {
-            const storageKey = activeGame === "hollow-knight"
-                ? `hollowKnightPersonalTimes:${category.id}`
-                : `cupheadPersonalTimes:${category.id}`;
+            const storageKey = `cupheadPersonalTimes:${category.id}`;
             const times = JSON.parse(localStorage.getItem(storageKey)) || {};
             exportData.categories[category.id] = {
                 label: category.label,
@@ -137,7 +130,7 @@ function exportPersonalTimes()
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${activeGame}-times-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `cuphead-times-${new Date().toISOString().split("T")[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -156,7 +149,7 @@ function importPersonalTimes(file)
             const importData = JSON.parse(e.target.result);
 
             if (!importData.categories) {
-                alert("Invalid file format: missing categories data");
+                alert(t("times-import.invalid"));
                 return;
             }
 
@@ -169,16 +162,14 @@ function importPersonalTimes(file)
                     Object.keys(categoryData.subOptions).forEach(subOptionId => {
                         const subOptionData = categoryData.subOptions[subOptionId];
                         if (subOptionData.times && Object.keys(subOptionData.times).length > 0) {
-                            const prefix = importData.game === "hollow-knight" ? "hollowKnightPersonalTimes" : "cupheadPersonalTimes";
-                            const storageKey = `${prefix}:${categoryId}:${subOptionId}`;
+                            const storageKey = `cupheadPersonalTimes:${categoryId}:${subOptionId}`;
                             writeStorageJson(storageKey, subOptionData.times);
                             importCount++;
                         }
                     });
                 } else if (categoryData.times) {
                     if (Object.keys(categoryData.times).length > 0) {
-                        const prefix = importData.game === "hollow-knight" ? "hollowKnightPersonalTimes" : "cupheadPersonalTimes";
-                        const storageKey = `${prefix}:${categoryId}`;
+                        const storageKey = `cupheadPersonalTimes:${categoryId}`;
                         writeStorageJson(storageKey, categoryData.times);
                         importCount++;
                     }
@@ -186,13 +177,13 @@ function importPersonalTimes(file)
             });
 
             if (importCount > 0) {
-                alert(`Successfully imported times from ${importCount} category/sub-option(s)`);
+                alert(tf("times-import.success", { count: importCount }));
                 renderActivePage();
             } else {
-                alert("No times found in the import file");
+                alert(t("times-import.empty"));
             }
         } catch (error) {
-            alert("Error importing file: Invalid JSON format");
+            alert(t("times-import.error"));
             console.error("Import error:", error);
         }
     };

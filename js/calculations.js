@@ -9,14 +9,17 @@ function getPersonalTimeEntries()
 {
     const storedTimes = getStoredPersonalTimes();
     const currentTable = document.getElementById("table");
-    const inputs = currentTable ? [...currentTable.querySelectorAll(".time-input")] : [];
+    const inputs = currentTable ? [...currentTable.querySelectorAll(".time-input, [data-auto-time]")] : [];
 
     return inputs.map(input =>
     {
-        const levelIndex = Number(input.dataset.levelIndex || 0);
+        const levelIndex = Number(input.dataset.levelIndex ?? input.dataset.autoTime ?? 0);
         const level = getLevelByFlatIndex(levelIndex);
-        const value = input.value.trim();
-        const seconds = value ? parseTime(value) : parseTime(storedTimes[input.id] || "");
+        const value = input.classList.contains("time-input") ? input.value.trim() : "";
+        const autoSeconds = input.dataset.autoTime !== undefined
+            ? (Number.isFinite(window.cupheadAutoTimes?.[levelIndex]) ? window.cupheadAutoTimes[levelIndex] : null)
+            : null;
+        const seconds = autoSeconds !== null ? autoSeconds : value ? parseTime(value) : parseTime(storedTimes[input.id] || "");
 
         // Generate times array from fRankTime if not already present
         if (level && !level.times && level.fRankTime) {
@@ -37,16 +40,6 @@ function getPersonalTimeEntries()
 function getPersonalTotalsData()
 {
     const entries = getPersonalTimeEntries();
-    if (activeGame === "hollow-knight") {
-        const hasAllTimes = entries.length === getActiveLevels().length
-            && entries.every(entry => entry.seconds !== null);
-        return [{
-            name: "Total",
-            total: hasAllTimes ? roundTime(entries.reduce((sum, entry) => sum + entry.seconds, 0)) : null,
-            thresholds: getActiveLevelRankTotals()
-        }];
-    }
-
     const islandRows = [];
     let entryIndex = 0;
 

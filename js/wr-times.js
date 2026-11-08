@@ -1,7 +1,19 @@
 // WR times fetching from alt.json and data updates
 
-const WR_TIMES_CACHE_KEY = "cupheadWrTimesCache";
+const WR_TIMES_CACHE_KEY = "cupheadRunViableTimesCache";
 const WR_TIMES_CACHE_DURATION = 24 * 60 * 60 * 1000;
+
+// runViable.json omits these entries. Keep the chosen references from alt.json
+// explicit so cached/network records cannot replace the intended strategies.
+const TABLE_REFERENCES_BY_VERSION = {
+    "1.1+": {
+        forestfollies: { time: 32.63, ILs: [{ name: "SBDWolf", url: "https://www.youtube.com/live/13ZSnTYvuGA?t=7173" }] }
+    },
+    "DLC": {
+        forestfollies: { time: 33.27, ILs: [{ name: "GamerAttack27", url: "https://youtu.be/q6M5TBPLKps" }] },
+        mausoleum: { time: 47.26, ILs: [{ name: "ExclamationMarkYT", url: "https://youtu.be/ro73lUU8jjQ" }] }
+    }
+};
 
 const BOSS_NAME_MAP = {
     "forestfollies": "Forest Follies",
@@ -33,8 +45,90 @@ const BOSS_NAME_MAP = {
     "mausoleum": "Mausoleum"
 };
 
+// Exact times transcribed from linked Run Viable IL YouTube titles. Update
+// these manually when those videos or the curated records change. Times are seconds.
+const RUN_VIABLE_EXACT_TIMES = {
+    "1.1+": {
+        therootpack: 33.76,
+        ribbyandcroaks: 40.79,
+        goopylegrande: 21.21,
+        hildaberg: 59.55,
+        cagneycarnation: 29.81,
+        baronessvonbonbon: 30.57,
+        wallywarbles: 46.44,
+        djimmithegreat: 74.96,
+        beppitheclown: 37.91,
+        grimmatchstick: 45.89,
+        rumorhoneybottoms: 36.58,
+        drkahlsrobot: 40.90,
+        sallystageplay: 43.69,
+        wernerwerman: 35.96,
+        captainbrineybeard: 36.52,
+        calamaria: 48.80,
+        phantomexpress: 56.64,
+        kingdice: 102.82,
+        thedevil: 38.95
+    },
+    "DLC L/S": {
+        glumstonethegiant: 45.66,
+        mortimerfreeze: 40.45,
+        thehowlingaces: 43.63,
+        estherwinchester: 59.72,
+        moonshinemob: 35.26,
+        chefsaltbaker: 49.74
+    },
+    "DLC C/S": {
+        glumstonethegiant: 47.15,
+        mortimerfreeze: 38.70,
+        thehowlingaces: 42.97,
+        estherwinchester: 59.72,
+        moonshinemob: 37.01,
+        chefsaltbaker: 49.84
+    }
+};
+
+const RUN_VIABLE_EXACT_TIME_VIDEO_IDS = {
+    "1.1+": {
+        therootpack: "UHC70HUdFjU",
+        ribbyandcroaks: "-KvAjbtm56E",
+        goopylegrande: "BGVRjK4zdFk",
+        hildaberg: "PThx8scpvck",
+        cagneycarnation: "l8oRg_H0yUM",
+        baronessvonbonbon: "TxaWkOJgapQ",
+        wallywarbles: "yP0lTtLRPzU",
+        djimmithegreat: "35_5D9qWfLA",
+        beppitheclown: "moBcYR2UqgQ",
+        grimmatchstick: "wADPxhZkybg",
+        rumorhoneybottoms: "7ffiWjfmSP4",
+        drkahlsrobot: "X-3BKVEpcU4",
+        sallystageplay: "OHhH3Wruraw",
+        wernerwerman: "O16oNulllw0",
+        captainbrineybeard: "1tJDk7gscp8",
+        calamaria: "zPS6SYQGj1Q",
+        phantomexpress: "cNlgq_i0x_c",
+        kingdice: "UguybSEYODk",
+        thedevil: "zLmqauewKEE"
+    },
+    "DLC L/S": {
+        glumstonethegiant: "tuotj9TXeKs",
+        mortimerfreeze: "oNAaIL4D73s",
+        thehowlingaces: "uf0yhInpcW8",
+        estherwinchester: "4nrjrwTZHw8",
+        moonshinemob: "zQ7bGN1IDfw",
+        chefsaltbaker: "N18iuwnwrDg"
+    },
+    "DLC C/S": {
+        glumstonethegiant: "e3hJNxOG_mQ",
+        mortimerfreeze: "UFkbukR0C6g",
+        thehowlingaces: "dqqT2n-83cw",
+        estherwinchester: "4nrjrwTZHw8",
+        moonshinemob: "UCLkF-T0jUo",
+        chefsaltbaker: "ZTuyj3HYtNw"
+    }
+};
+
 /**
- * Fetches WR times from myekul.com and updates the data structure
+ * Fetches curated run-viable IL times from myekul.com and updates the data structure
  * Caches results in localStorage to avoid excessive fetching
  */
 async function fetchAndUpdateWrTimes()
@@ -54,7 +148,7 @@ async function fetchAndUpdateWrTimes()
     }
 
     try {
-        const response = await fetch("https://myekul.com/run-recap/resources/alt.json");
+        const response = await fetch("https://myekul.com/run-recap/resources/runViable.json");
         if (!response.ok) {
             console.error("Failed to fetch WR times:", response.status);
             return;
@@ -62,14 +156,14 @@ async function fetchAndUpdateWrTimes()
 
         const data = await response.json();
 
-        console.log("Fetched WR data:", data);
+        console.log("Fetched run-viable IL data:", data);
 
         localStorage.setItem(WR_TIMES_CACHE_KEY, JSON.stringify({
             data,
             timestamp: Date.now()
         }));
 
-        console.log("Fetched and cached WR times");
+        console.log("Fetched and cached run-viable IL times");
         updateWrTimesInData(data);
         return data;
     } catch (error) {
@@ -78,51 +172,56 @@ async function fetchAndUpdateWrTimes()
 }
 
 /**
- * Finds the fastest WR time from a boss strategy list in alt.json
- * @param {Array} strategies - Strategy entries for a boss
+ * Reads a boss's curated run-viable record from runViable.json.
+ * @param {Object} runViableBoss - Run-viable time and IL references for a boss
  * @returns {{ time: number, url: string|null, player: string|null }|null} Best entry or null
  */
-function getBestWrTimeFromStrategies(strategies)
+function getRunViableTime(runViableBoss, exactTimeOverride, exactVideoId)
 {
-    let best = null;
+    const time = Number.isFinite(exactTimeOverride)
+        ? exactTimeOverride
+        : Number(runViableBoss?.time);
+    if (!Number.isFinite(time) || time <= 0) return null;
 
-    for (const strategy of strategies) {
-        if (!strategy.time || strategy.title) continue;
-
-        const time = parseTime(String(strategy.time));
-        if (time !== null && (best === null || time < best.time)) {
-            best = {
-                time,
-                url: strategy.url || null,
-                player: strategy.player || null
-            };
-        }
-    }
-
-    return best;
+    const representativeIL = exactVideoId
+        ? runViableBoss.ILs?.find(il => il.url?.includes(exactVideoId))
+        : null;
+    const bestIL = representativeIL || runViableBoss.ILs?.[0];
+    return {
+        time,
+        url: bestIL?.url || null,
+        player: bestIL?.name?.replace(/^\*/, "") || null
+    };
 }
 
 /**
  * Updates the data structure with fetched WR times
- * @param {Object} wrData - The fetched alt.json data
+ * @param {Object} wrData - The fetched runViable.json data
  */
 function updateWrTimesInData(wrData)
 {
     if (wrData["1.1+"]) {
-        updateCategoryTimes("1-1", wrData["1.1+"], BOSS_NAME_MAP);
+        updateCategoryTimes("1-1", { ...wrData["1.1+"], ...TABLE_REFERENCES_BY_VERSION["1.1+"] }, BOSS_NAME_MAP, null,
+            RUN_VIABLE_EXACT_TIMES["1.1+"], RUN_VIABLE_EXACT_TIME_VIDEO_IDS["1.1+"]);
     }
 
     if (wrData["DLC L/S"]) {
-        updateCategoryTimes("DLC", wrData["DLC L/S"], BOSS_NAME_MAP, "lobber");
+        updateCategoryTimes("DLC", { ...wrData["DLC L/S"], ...TABLE_REFERENCES_BY_VERSION.DLC }, BOSS_NAME_MAP, "lobber",
+            RUN_VIABLE_EXACT_TIMES["DLC L/S"], RUN_VIABLE_EXACT_TIME_VIDEO_IDS["DLC L/S"]);
     }
 
     if (wrData["DLC C/S"]) {
-        // Some bosses (Forest Follies, Mausoleum, Esther Winchester) don't have
-        // Charge-specific entries in alt.json. Fall back to Lobber data for them.
+        // Some bosses don't have charge-specific entries. Fall back to Lobber data.
         const chargeData = wrData["DLC C/S"];
         const lobberFallback = wrData["DLC L/S"] || {};
-        const mergedData = { ...lobberFallback, ...chargeData };
-        updateCategoryTimes("DLC", mergedData, BOSS_NAME_MAP, "charge");
+        const mergedData = { ...lobberFallback, ...chargeData, ...TABLE_REFERENCES_BY_VERSION.DLC };
+        updateCategoryTimes("DLC", mergedData, BOSS_NAME_MAP, "charge", {
+            ...RUN_VIABLE_EXACT_TIMES["DLC L/S"],
+            ...RUN_VIABLE_EXACT_TIMES["DLC C/S"]
+        }, {
+            ...RUN_VIABLE_EXACT_TIME_VIDEO_IDS["DLC L/S"],
+            ...RUN_VIABLE_EXACT_TIME_VIDEO_IDS["DLC C/S"]
+        });
     }
 
     // Calculate fallback rank multipliers based on WR/F ratio after updating times
@@ -222,7 +321,7 @@ function regenerateCategoryTimes(categoryData, multipliers)
  * @param {Object} bossNameMap - Mapping of JSON boss names to data.js names
  * @param {string|null} subOptionId - Optional DLC sub-option id (lobber/charge)
  */
-function updateCategoryTimes(categoryId, categoryData, bossNameMap, subOptionId = null)
+function updateCategoryTimes(categoryId, categoryData, bossNameMap, subOptionId = null, exactTimes = null, exactVideoIds = null)
 {
     const category = categories.find(cat => cat.id === categoryId);
     if (!category) return;
@@ -251,7 +350,11 @@ function updateCategoryTimes(categoryId, categoryData, bossNameMap, subOptionId 
 
                 if (!jsonBossKey || !categoryData[jsonBossKey]) return;
 
-                const wrEntry = getBestWrTimeFromStrategies(categoryData[jsonBossKey]);
+                const wrEntry = getRunViableTime(
+                    categoryData[jsonBossKey],
+                    exactTimes?.[jsonBossKey],
+                    exactVideoIds?.[jsonBossKey]
+                );
                 if (wrEntry === null) return;
 
                 const wrTime = wrEntry.time;

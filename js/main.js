@@ -1,18 +1,12 @@
 // Application entry point
 
-function playSound(url, volume = 0.2)
-{
-    const audio = new Audio(url);
-    audio.volume = volume;
-    audio.play().catch(() => {});
-}
-
 async function initializeApp()
 {
     renderCategoryControls();
-    if (activeGame === "cuphead") {
-        await fetchAndUpdateWrTimes();
-    }
+    generateAllLevelTimes();
+    renderActivePage();
+    // Render local data first; an unavailable reference site must not blank Training.
+    await fetchAndUpdateWrTimes();
     generateAllLevelTimes();
     renderActivePage();
 }

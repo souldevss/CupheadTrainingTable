@@ -26,13 +26,13 @@ function renderPersonalTimesPage()
 
     const storedTimes = getStoredPersonalTimes();
     let levelCounter = 0;
-    const hasIslands = activeGame === "cuphead";
+    const hasIslands = true;
     let html = `
 <table class="personal-table">
 <thead>
 <tr>
     ${hasIslands ? `<th class="island sticky-col-1">${t("header.islands")}</th>` : ""}
-    <th class="boss ${hasIslands ? "sticky-col-2" : "split-cell"}">${hasIslands ? t("header.levels") : "Split"}</th>
+    <th class="boss ${hasIslands ? "sticky-col-2" : "split-cell"}">${hasIslands ? t("header.levels") : t("personal.split")}</th>
     <th class="personal-time-col"></th>
 </tr>
 </thead>
@@ -134,8 +134,6 @@ function renderPersonalTimesPage()
     personalInputs.forEach(input => {
         let loopAudio = null;
 
-        const playSelectSound = () => playSound(APP_SOUND_URLS.selection, 0.15);
-
         const startLoopSound = () => {
             if (loopAudio) {
                 loopAudio.pause();
@@ -156,7 +154,6 @@ function renderPersonalTimesPage()
         };
 
         input.addEventListener("focus", () => {
-            playSelectSound();
             startLoopSound();
         });
 
@@ -179,29 +176,6 @@ function renderPersonalTotals()
 {
     totals.hidden = false;
     const totalsData = getPersonalTotalsData();
-    if (activeGame === "hollow-knight") {
-        const row = totalsData[0];
-        const rankIndex = row.total === null ? null : getRankIndexForTime(row.total, row.thresholds);
-        const rankStyle = getInterpolatedRankStyle(row.total, row.thresholds);
-        totals.innerHTML = `
-<table class="personal-totals-table hollow-knight-personal-total">
-<tbody>
-    <tr class="hollow-knight-total-row">
-        <th class="total-label">Total</th>
-        <td class="personal-time-col" style="background: ${rankStyle.background}; color: ${rankStyle.color};">
-            <div class="time-input-wrapper total-time-wrapper">
-                <span>${row.total === null ? "-" : formatTime(row.total)}</span>
-                <span class="time-rank-display" style="background: ${rankStyle.background}; color: ${rankStyle.color};">
-                    ${rankIndex === null ? "-" : ranks[rankIndex]}
-                </span>
-            </div>
-        </td>
-    </tr>
-</tbody>
-</table>`;
-        return;
-    }
-
     let totalsHtml = `
 <table class="personal-totals-table">
 <thead>
@@ -228,7 +202,7 @@ function renderPersonalTotals()
 
         totalsHtml += `
     <tr ${tooltipAttr}>
-        <td class="island sticky-col-1" style="background: ${rowStyle.background}; color: ${rowStyle.color};">${row.name}</td>
+        <td class="island sticky-col-1 isle-artwork" style="background-color: ${rowStyle.background}; color: ${rowStyle.color}; ${isleArtworkStyle(row.name, rowStyle.background)}">${row.name}</td>
         <td class="personal-time-col" style="background: ${rankStyle.background}; color: ${rankStyle.color};">
             <div class="time-input-wrapper" style="background: transparent !important; justify-content: space-between; padding: 1px 6px;">
                 <span>${row.total === null ? "-" : formatTime(row.total)}</span>
@@ -296,12 +270,12 @@ function renderRankChart()
     );
 
     const formatRankLabel = rank => {
-        if (!rank) return "Unknown Rank";
+        if (!rank) return t("personal.unknown-rank");
         const normalized = rank.trim();
-        if (normalized.length === 0) return "Unknown Rank";
+        if (normalized.length === 0) return t("personal.unknown-rank");
         return normalized.endsWith("Rank") || normalized.endsWith("rank")
             ? normalized
-            : `${normalized} Rank`;
+            : `${normalized}${t("personal.rank-suffix")}`;
     };
 
     const segmentsHtml = filledCount === 0
@@ -319,7 +293,7 @@ function renderRankChart()
         }).join("");
 
     const rowsHtml = filledCount === 0
-        ? `<div class="rank-chart-empty">No times yet</div>`
+        ? `<div class="rank-chart-empty">${t("personal.no-times")}</div>`
         : displayRanks.map(item =>
         {
             const percent = Math.round((item.count / filledCount) * 100);
@@ -351,17 +325,17 @@ function renderRankChart()
     <div class="rank-chart-header">
         <div>
             <h2>${t("personal.rank-distribution")}</h2>
-            <span>${filledCount}/${totalCount} times</span>
+            <span>${filledCount}/${totalCount} ${t("personal.times-count")}</span>
         </div>
     </div>
     <div class="rank-chart-stack">${segmentsHtml}</div>
     <div class="rank-chart-stats">
         <div>
-            <span>Best</span>
+            <span>${t("personal.best")}</span>
             <strong>${topRank ? topRank.rank : "-"}</strong>
         </div>
         <div>
-            <span>Most</span>
+            <span>${t("personal.most")}</span>
             <strong>${mostCommonRank ? mostCommonRank.rank : "-"}</strong>
         </div>
     </div>

@@ -16,7 +16,7 @@ function setActiveCategorySelection(nextCategoryId, nextSubOptionId = null)
         : null;
 
     localStorage.setItem(
-        activeGame === "hollow-knight" ? "hollowKnightSpeedrunCategory" : "cupheadSpeedrunCategory",
+        "cupheadSpeedrunCategory",
         activeCategory.id
     );
 
@@ -32,12 +32,8 @@ function setActiveCategorySelection(nextCategoryId, nextSubOptionId = null)
 function getInitialCategory()
 {
     const storedCategoryId = localStorage.getItem(
-        activeGame === "hollow-knight" ? "hollowKnightSpeedrunCategory" : "cupheadSpeedrunCategory"
+        "cupheadSpeedrunCategory"
     );
-
-    if (activeGame === "hollow-knight") {
-        return categories.find(category => category.id === storedCategoryId) || categories[0];
-    }
 
     if (storedCategoryId === "version-1-1") {
         localStorage.setItem("cupheadSpeedrunCategory", "1-1");
@@ -81,11 +77,13 @@ function getInitialSubOption()
  * Renders category selection tabs
  * For DLC categories with sub-options, displays icon buttons for weapon selection
  */
-function renderCategoryControls()
+function renderCategoryControls(options = {})
 {
     if (!categoryTabs) return;
+    const displayedCategories = options.categories || categories;
+    const selectCategory = options.onSelect || setActiveCategorySelection;
 
-    categoryTabs.innerHTML = categories.map(category => {
+    categoryTabs.innerHTML = displayedCategories.map(category => {
         if (category.subOptions && category.id === activeCategory.id) {
             return `
                 <div class="category-tab-group">
@@ -127,9 +125,8 @@ function renderCategoryControls()
     {
         button.addEventListener("click", () =>
         {
-            playSound(APP_SOUND_URLS.selection, 0.2);
             if (button.dataset.categoryId === activeCategory.id) return;
-            setActiveCategorySelection(button.dataset.categoryId);
+            selectCategory(button.dataset.categoryId);
         });
     });
 
@@ -137,10 +134,9 @@ function renderCategoryControls()
     {
         button.addEventListener("click", () =>
         {
-            playSound(APP_SOUND_URLS.selection, 0.2);
             const nextSubOption = button.dataset.subOptionId;
             if (!nextSubOption || nextSubOption === activeSubOption) return;
-            setActiveCategorySelection(activeCategory.id, nextSubOption);
+            selectCategory(activeCategory.id, nextSubOption);
         });
     });
 }
