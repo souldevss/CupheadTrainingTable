@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cuphead Training App</title>
 <link rel="icon" type="image/png" href="assets/icons/app-logo-small.png">
-    <link rel="stylesheet" href="style.css?v=1.1.8">
+    <script src="js/site-palette.js?v=flag-palette"></script>
+    <link rel="stylesheet" href="style.css?v=flag-palette">
+    <link rel="stylesheet" href="css/site-palette.css?v=flag-palette">
 </head>
 <body data-page="personal-times">
 
@@ -16,9 +18,11 @@
     </div>
     <a href="info.html" class="info-nav-btn" data-i18n-aria-label="ui.info-aria" aria-label="How it works">&#9432;</a>
 
-    <button id="lang-toggle-btn" class="lang-toggle-btn-inline" type="button" onclick="setActiveLanguage(getActiveLanguage() === 'pt-BR' ? 'en' : 'pt-BR')" data-i18n-aria-label="ui.language-aria" aria-label="Toggle language">
-        <img src="https://flagcdn.com/w40/us.png" srcset="https://flagcdn.com/w80/us.png 2x" alt="English" width="28" height="21">
-    </button>
+    <div class="header-preferences">
+        <button id="lang-toggle-btn" class="lang-toggle-btn-inline" type="button" onclick="setActiveLanguage(getActiveLanguage() === 'pt-BR' ? 'en' : 'pt-BR')" data-i18n-aria-label="ui.language-aria" aria-label="Toggle language">
+            <img src="https://flagcdn.com/w40/us.png" srcset="https://flagcdn.com/w80/us.png 2x" alt="English" width="28" height="21">
+        </button>
+    </div>
 </div>
 
 <div class="nav-row">
@@ -61,7 +65,7 @@
     <script src="js/render-time-table.js?v=1.1.8"></script>
     <script src="js/render-personal.js?v=1.1.8"></script>
     <script src="js/render.js?v=1.1.8"></script>
-    <script src="js/language.js?v=1.1.8"></script>
+    <script src="js/language.js?v=flag-palette"></script>
     <script src="js/main.js?v=1.1.8"></script>
 
 </body>

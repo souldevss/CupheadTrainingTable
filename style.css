@@ -42,7 +42,7 @@ body {
 
 .pages {
     display: grid;
-    grid-template-columns: minmax(44px, 1fr) minmax(0, max-content) minmax(44px, 1fr);
+    grid-template-columns: minmax(80px, 1fr) minmax(0, max-content) minmax(80px, 1fr);
     align-items: center;
     gap: clamp(8px, 2vw, 16px);
     margin-bottom: 12px;
@@ -106,9 +106,19 @@ body {
     right: calc(120px + 100% - 100vw);
 }
 
-.lang-toggle-btn-inline {
+.header-preferences {
     grid-column: 3;
     justify-self: end;
+}
+
+@media (max-width: 540px) {
+    .pages {
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 8px;
+    }
+
+    .pages .training-table-brand { grid-column: 1; }
+    .header-preferences { grid-column: 2; }
 }
 
 .game-toggle-btn:hover,
@@ -436,7 +446,7 @@ th.personal-time-col {
     padding: 1px 4px;
     border-radius: 4px;
     transition: background 0.2s ease;
-    background: #242629 !important;
+    background: var(--palette-input, #242629) !important;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
