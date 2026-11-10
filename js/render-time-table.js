@@ -10,7 +10,7 @@ function renderTimeTablePage()
         return;
     }
 
-    const hasIslands = true;
+    const hasIslands = activeGame === "cuphead";
     let html = `
 <table>
 <thead>
@@ -63,6 +63,15 @@ function renderTimeTablePage()
         for (const island of getActiveIslands()) {
             island.levels.forEach((boss, index) => renderLevelRow(boss, island, index));
         }
+    } else {
+        getActiveLevels().forEach(boss => renderLevelRow(boss));
+        html += `<tr class="hollow-knight-total-row">
+            <th class="split-cell total-label">${t("header.total")}</th>
+            ${getActiveLevelRankTotals().map((time, rankIndex) => {
+                const style = getRankStyle(rankIndex);
+                return `<td class="rank-col rank-${rankIndex}" style="background:${style.background};color:${style.color}">${formatTime(time)}</td>`;
+            }).join("")}
+        </tr>`;
     }
 
     html += `
@@ -71,10 +80,8 @@ function renderTimeTablePage()
 `;
 
     table.innerHTML = html;
-    if (hasIslands) {
-        totals.hidden = false;
-        renderTimeTableTotals();
-    }
+    totals.hidden = !hasIslands;
+    if (hasIslands) renderTimeTableTotals();
 
     requestAnimationFrame(matchColumnWidths);
     window.addEventListener("load", matchColumnWidths);

@@ -259,3 +259,62 @@ const speedrunCategories = [
         ]
     }
 ];
+
+const silksongCategories = [
+    {
+        id: "silksong-any-percent",
+        label: "Any% (Cloakless)",
+        title: "Any% (Cloakless)",
+        levels: [
+            { name: "Moss Mother Exit", color: "#b3ecc8", wrTime: 149.01, fRankTime: 170.00 },
+            { name: "Silk Spear Exit", color: "#c8ecb3", wrTime: 192.38, fRankTime: 225.00 },
+            { name: "Marrow Bell", color: "#ecd7b3", wrTime: 141.52, fRankTime: 175.00 },
+            { name: "Swift Step Exit", color: "#b3d7ec", wrTime: 177.13, fRankTime: 215.00 },
+            { name: "Enter Wormways", color: "#d7b3ec", wrTime: 164.03, fRankTime: 200.00 },
+            { name: "Cling Grip Exit", color: "#ecb3d7", wrTime: 128.63, fRankTime: 155.00 },
+            { name: "Widow", color: "#b3ecd7", wrTime: 74.81, fRankTime: 110.00 },
+            { name: "Enter Greymoor", color: "#ecc8b3", wrTime: 183.16, fRankTime: 200.00 },
+            { name: "Enter The Mist", color: "#c8b3ec", wrTime: 91.58, fRankTime: 125.00 },
+            { name: "Leave The Mist", color: "#b3c8ec", wrTime: 42.99, fRankTime: 95.00 },
+            { name: "Act 2 Started", color: "#ecb3b3", wrTime: 160.89, fRankTime: 205.00 },
+            { name: "Cogwork Dancers Exit", color: "#b3ecec", wrTime: 171.09, fRankTime: 195.00 },
+            { name: "Enter Whispering Vaults", color: "#ececb3", wrTime: 79.97, fRankTime: 125.00 },
+            { name: "Trobbio Exit", color: "#d7ecb3", wrTime: 94.30, fRankTime: 140.00 },
+            { name: "Clawline Arena Exit", color: "#b3b3ec", wrTime: 115.30, fRankTime: 140.00 },
+            { name: "Vaultkeepers Melody Exit", color: "#ecb3ec", wrTime: 99.43, fRankTime: 125.00 },
+            { name: "Architects Melody Exit", color: "#c6ebc6", wrTime: 125.45, fRankTime: 175.00 },
+            { name: "Enter High Halls Arena", color: "#b3ecc8", wrTime: 93.95, fRankTime: 135.00 },
+            { name: "Conductors Melody Exit", color: "#c8ecb3", wrTime: 149.91, fRankTime: 235.00 },
+            { name: "Enter Lace 2", color: "#ecd7b3", wrTime: 93.58, fRankTime: 105.00 },
+            { name: "Lace 2 Arena Exit", color: "#b3d7ec", wrTime: 108.38, fRankTime: 160.00 },
+            { name: "Grand Mother Silk", color: "#d7b3ec", wrTime: 141.59, fRankTime: 190.00 }
+        ]
+    }
+];
+
+const hollowKnightCategories = [
+    {
+        id: "rafters-route",
+        label: "Rafters Route",
+        title: "Rafters Route",
+        levels: [
+            { name: "Vengeful Spirit", icon: "assets/icons/hollowknightsplits/Vengeful Spirit.png", color: "#b7c9e8", wrTime: 205.83, fRankTime: 222 },
+            { name: "Greenpath Entry", icon: "assets/icons/hollowknightsplits/Greenpath.png", color: "#a9d6a1", wrTime: 100.25, fRankTime: 113 },
+            { name: "Mothwing Cloak", icon: "assets/icons/hollowknightsplits/Mothwing Cloak.png", color: "#b6d7ed", wrTime: 141.37, fRankTime: 165 },
+            { name: "Mantis Claw", icon: "assets/icons/hollowknightsplits/Mantis Claw.png", color: "#c8b9e8", wrTime: 93.52, fRankTime: 109 },
+            { name: "Enter Blue Lake", icon: "assets/icons/hollowknightsplits/Enter Blue Lake.png", color: "#9ed9e6", wrTime: 118.75, fRankTime: 139 },
+            { name: "Dream Nail", icon: "assets/icons/hollowknightsplits/Dream Nail.png", color: "#d2c0ed", wrTime: 85.11, fRankTime: 98 },
+            { name: "Chandelier", icon: "assets/icons/hollowknightsplits/Chandelier.png", color: "#f0d69a", wrTime: 128.74, fRankTime: 150 },
+            { name: "Watcher Knights", icon: "assets/icons/hollowknightsplits/Watcher Knights.png", color: "#d9b7c4", wrTime: 67.01, fRankTime: 130 },
+            { name: "Rafters Entry", icon: "assets/icons/hollowknightsplits/Lance Sentry.png", color: "#c5c2e9", wrTime: 93.88, fRankTime: 113.5 },
+            { name: "Lantern", icon: "assets/icons/hollowknightsplits/Lumafly Lantern.png", color: "#f4df8d", wrTime: 99.81, fRankTime: 120 },
+            { name: "Crystal Heart", icon: "assets/icons/hollowknightsplits/Crystal Heart.png", color: "#a4e1e7", wrTime: 113.58, fRankTime: 140 },
+            { name: "Uumuu", icon: "assets/icons/hollowknightsplits/Uumuu.png", color: "#9dddc4", wrTime: 116.56, fRankTime: 160 },
+            { name: "Queen's Gardens", icon: "assets/icons/hollowknightsplits/Queen's Gardens.png", color: "#b6dcaa", wrTime: 94.5, fRankTime: 116.5 },
+            { name: "Trap Bench", icon: "assets/icons/hollowknightsplits/Trap Bench.png", color: "#e2b7bd", wrTime: 115.03, fRankTime: 139 },
+            { name: "Herrah", icon: "assets/icons/hollowknightsplits/Herrah.png", color: "#d3b2dc", wrTime: 63.38, fRankTime: 90 },
+            { name: "Scream", icon: "assets/icons/hollowknightsplits/Scream.png", color: "#e8a8a2", wrTime: 92.31, fRankTime: 100 },
+            { name: "The Hollow Knight", icon: "assets/icons/hollowknightsplits/The Hollow Knight.png", color: "#e1e6ee", wrTime: 87.54, fRankTime: 115 }
+        ]
+    }
+];

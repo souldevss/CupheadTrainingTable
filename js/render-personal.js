@@ -26,7 +26,7 @@ function renderPersonalTimesPage()
 
     const storedTimes = getStoredPersonalTimes();
     let levelCounter = 0;
-    const hasIslands = true;
+    const hasIslands = activeGame === "cuphead";
     let html = `
 <table class="personal-table">
 <thead>
@@ -176,6 +176,22 @@ function renderPersonalTotals()
 {
     totals.hidden = false;
     const totalsData = getPersonalTotalsData();
+    if (activeGame !== "cuphead") {
+        const { total, thresholds } = totalsData[0];
+        const rank = total === null ? null : getRankIndexForTime(total, thresholds);
+        const style = getInterpolatedRankStyle(total, thresholds);
+        totals.innerHTML = `<table class="personal-totals-table hollow-knight-personal-total"><tbody>
+            <tr class="hollow-knight-total-row">
+                <th class="total-label">${t("header.total")}</th>
+                <td class="personal-time-col">
+                    <div class="time-input-wrapper total-time-wrapper">
+                        <span>${total === null ? "—" : formatTime(total)}</span>
+                        <span class="time-rank-display" style="background:${style.background};color:${style.color}">${rank === null ? "—" : ranks[rank]}</span>
+                    </div>
+                </td>
+            </tr></tbody></table>`;
+        return;
+    }
     let totalsHtml = `
 <table class="personal-totals-table">
 <thead>

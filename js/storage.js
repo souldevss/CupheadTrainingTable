@@ -4,12 +4,10 @@
  * Generates the localStorage key for personal times based on current category and sub-option
  * @returns {string} The storage key for the current context
  */
-function getPersonalTimesStorageKey()
+function getPersonalTimesStorageKey(categoryId = activeCategory.id, subOption = activeSubOption, game = activeGame)
 {
-    if (activeCategory.id === "DLC" && activeSubOption) {
-        return `cupheadPersonalTimes:${activeCategory.id}:${activeSubOption}`;
-    }
-    return `cupheadPersonalTimes:${activeCategory.id}`;
+    const key = `${trainingGames[game].storage}PersonalTimes:${categoryId}`;
+    return categoryId === "DLC" && subOption ? `${key}:${subOption}` : key;
 }
 
 /**
@@ -36,6 +34,7 @@ function getStoredPersonalTimes()
     try {
         const storageKey = getPersonalTimesStorageKey();
         const categoryTimes = readStorageJson(storageKey, {});
+        if (activeGame !== "cuphead") return categoryTimes;
         const oldTimes = activeCategory.id === "1-1"
             ? readStorageJson("cupheadPersonalTimes", {})
             : {};
@@ -97,7 +96,7 @@ function exportPersonalTimes()
     const exportData = {
         version: "1.0",
         exportDate: new Date().toISOString(),
-        game: "cuphead",
+        game: activeGame,
         categories: {}
     };
 
@@ -108,7 +107,7 @@ function exportPersonalTimes()
                 subOptions: {}
             };
             category.subOptions.forEach(subOption => {
-                const storageKey = `cupheadPersonalTimes:${category.id}:${subOption.id}`;
+                const storageKey = getPersonalTimesStorageKey(category.id, subOption.id);
                 const times = readStorageJson(storageKey, {});
                 exportData.categories[category.id].subOptions[subOption.id] = {
                     label: subOption.label,
@@ -116,8 +115,8 @@ function exportPersonalTimes()
                 };
             });
         } else {
-            const storageKey = `cupheadPersonalTimes:${category.id}`;
-            const times = JSON.parse(localStorage.getItem(storageKey)) || {};
+            const storageKey = getPersonalTimesStorageKey(category.id, null);
+            const times = readStorageJson(storageKey, {});
             exportData.categories[category.id] = {
                 label: category.label,
                 times
@@ -130,7 +129,7 @@ function exportPersonalTimes()
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `cuphead-times-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `${activeGame}-times-${new Date().toISOString().split("T")[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -148,7 +147,8 @@ function importPersonalTimes(file)
         try {
             const importData = JSON.parse(e.target.result);
 
-            if (!importData.categories) {
+            const game = importData.game ?? "cuphead";
+            if (!importData.categories || !Object.hasOwn(trainingGames, game)) {
                 alert(t("times-import.invalid"));
                 return;
             }
@@ -162,14 +162,14 @@ function importPersonalTimes(file)
                     Object.keys(categoryData.subOptions).forEach(subOptionId => {
                         const subOptionData = categoryData.subOptions[subOptionId];
                         if (subOptionData.times && Object.keys(subOptionData.times).length > 0) {
-                            const storageKey = `cupheadPersonalTimes:${categoryId}:${subOptionId}`;
+                            const storageKey = getPersonalTimesStorageKey(categoryId, subOptionId, game);
                             writeStorageJson(storageKey, subOptionData.times);
                             importCount++;
                         }
                     });
                 } else if (categoryData.times) {
                     if (Object.keys(categoryData.times).length > 0) {
-                        const storageKey = `cupheadPersonalTimes:${categoryId}`;
+                        const storageKey = getPersonalTimesStorageKey(categoryId, null, game);
                         writeStorageJson(storageKey, categoryData.times);
                         importCount++;
                     }

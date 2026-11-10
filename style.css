@@ -1,3 +1,8 @@
+@font-face { font-family:"Alegreya Sans SC"; src:url("assets/fonts/alegreya-sans-sc-bold.woff2") format("woff2"); font-weight:700; font-display:swap; }
+@font-face { font-family:"Cinzel"; src:url("assets/fonts/cinzel-bold.woff2") format("woff2"); font-weight:700; font-display:swap; }
+@font-face { font-family:"Silentina Local"; src:local("Silentina Movie"), local("SilentinaMovie"), local("Silentina Film"), local("SilentinaFilm"); font-weight:700; }
+@font-face { font-family:"Trajan Local"; src:local("Trajan Pro Bold"), local("TrajanPro-Bold"), local("Trajan Pro 3 Bold"), local("TrajanPro3-Bold"); font-weight:700; }
+
 :root {
     --panel-bg: #1a303c;
     --panel-bg-deep: #132632;
@@ -7,7 +12,7 @@
     --panel-accent-bright: #d5b66b;
 }
 
-body[data-page="personal-times"][data-game="hollow-knight"] .scroll-wrapper {
+body[data-page="personal-times"]:is([data-game="hollow-knight"], [data-game="silksong"]) .scroll-wrapper {
     display: block;
 }
 
@@ -23,7 +28,7 @@ body {
     min-height: 100%;
     margin: 0;
     padding: 20px;
-    background-image: linear-gradient(180deg, rgba(15, 19, 28, .14), rgba(15, 19, 28, .38)), url("assets/backgrounds/myekul-bg.png");
+    background-image: linear-gradient(180deg, rgba(15, 19, 28, .14), rgba(15, 19, 28, .38)), var(--game-background, url("assets/backgrounds/myekul-bg.png"));
     background-repeat: no-repeat;
     background-position: center center;
     background-attachment: fixed;
@@ -35,14 +40,13 @@ body {
 }
 
 .pages {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(44px, 1fr) minmax(0, max-content) minmax(44px, 1fr);
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    gap: clamp(8px, 2vw, 16px);
     margin-bottom: 12px;
     width: 100%;
-    min-height: 96px;
-    padding-inline: 72px;
+    min-height: 64px;
 }
 
 #bigtitle {
@@ -102,9 +106,8 @@ body {
 }
 
 .lang-toggle-btn-inline {
-    position: fixed;
-    top: 47px;
-    right: 20px;
+    grid-column: 3;
+    justify-self: end;
 }
 
 .game-toggle-btn:hover,
@@ -113,174 +116,17 @@ body {
     border-color: #e0b965;
 }
 
-body[data-game="hollow-knight"] {
-    background-color: #070b13;
-    background-image:
-        linear-gradient(rgba(5, 9, 16, 0.38), rgba(5, 9, 16, 0.38)),
-        url("assets/backgrounds/hollowknight_background.png");
-    background-position: center center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    color: #e8edf5;
-    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
-    font-weight: 600;
-}
+body[data-game="hollow-knight"] { --game-background:url("assets/backgrounds/hollowknight_background.png"); }
+body[data-game="silksong"] { --game-background:url("assets/backgrounds/silksong-background.png"); }
 
-body[data-game="hollow-knight"] .page-tabs,
-body[data-game="hollow-knight"] .category-tab,
-body[data-game="hollow-knight"] .data-control-btn {
-    background-color: #172231;
-    border-color: #465870;
-}
-
-body[data-game="hollow-knight"] .page-tabs a.active,
-body[data-game="hollow-knight"] .category-tab.is-active {
-    background: #c9d7e8;
-    color: #111824;
-}
-
-body[data-game="hollow-knight"] th,
-body[data-game="hollow-knight"] .rank-chart-header {
-    background: #35475e;
-}
-
-body[data-game="hollow-knight"] .game-toggle-btn {
-    background: #35475e;
-    border-color: #c9d7e8;
-}
-
-body[data-game="hollow-knight"] .boss {
-    left: 0;
-    background: #182536 !important;
-}
-
-body[data-game="hollow-knight"] .split-cell {
-    min-width: 220px;
-    width: 220px;
-}
-
-body[data-game="hollow-knight"] .boss-content {
-    flex-direction: row-reverse;
-    justify-content: space-between;
-    gap: 6px;
-}
-
-body[data-game="hollow-knight"] .boss-icon {
-    width: auto;
-    max-width: 64px;
-    height: 32px;
-}
-
-body[data-game="hollow-knight"] .boss span {
-    flex: 1 1 auto;
-    min-width: 0;
-    font-size: 15px;
-    font-weight: 700;
-}
-
-body[data-game="hollow-knight"] .personal-totals-table.hollow-knight-personal-total {
-    width: 420px;
-    table-layout: fixed;
-}
-
-body[data-game="hollow-knight"] .hollow-knight-personal-total .total-label {
-    width: 220px;
-}
-
-body[data-game="hollow-knight"] .hollow-knight-personal-total .personal-time-col {
-    width: 200px;
-    min-width: 200px;
-}
-
-body[data-game="hollow-knight"] .total-time-wrapper {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-}
-
-body[data-game="hollow-knight"] .total-time-wrapper > span:first-child {
-    min-width: 0;
-    text-align: left;
-    font-size: 16px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-}
-
-body[data-game="hollow-knight"] .total-time-wrapper .time-rank-display {
-    min-width: 56px;
-    font-size: 14px;
-    font-weight: 800;
-}
-
-body[data-game="hollow-knight"] .info-page,
-body[data-game="hollow-knight"] .rank-chart,
-body[data-game="hollow-knight"] .page-tabs a,
-body[data-game="hollow-knight"] .category-tab {
-    font-weight: 700;
-}
-
-body[data-page="personal-times"][data-game="hollow-knight"] .time-input-wrapper {
-    min-height: 32px;
-}
-
-body[data-page="personal-times"][data-game="hollow-knight"] .time-input,
-body[data-page="personal-times"][data-game="hollow-knight"] .time-rank-display {
-    height: 28px;
-    font-size: 14px;
-}
-
-body[data-game="hollow-knight"] .rank-chart-header span,
-body[data-game="hollow-knight"] .rank-chart-stats span,
-body[data-game="hollow-knight"] .rank-chart-badge,
-body[data-game="hollow-knight"] .rank-chart-count,
-body[data-game="hollow-knight"] .rank-chart-empty {
-    font-size: 14px;
-}
-
-body[data-game="hollow-knight"] .hollow-knight-total-row > * {
-    border-top: 3px solid #c9d7e8;
-    font-weight: 900;
-}
-
-body[data-game="hollow-knight"] .total-label {
-    position: sticky;
-    left: 0;
-    z-index: 25;
-    min-width: 220px;
-    width: 220px;
-    background: #182536;
-    color: #f4f7fb;
-}
-
-body[data-game="hollow-knight"] .hollow-knight-personal-total {
-    margin-top: 8px;
-}
-
-body[data-game="hollow-knight"] .total-time-wrapper {
-    justify-content: space-between;
-    padding: 1px 6px;
-    background: transparent !important;
-}
-
-body[data-game="hollow-knight"] .hollow-knight-personal-total .personal-time-col {
-    background: #182536 !important;
-    color: #f4f7fb !important;
-}
-
-body[data-game="hollow-knight"] .total-time-wrapper > span:first-child {
-    color: #f4f7fb !important;
-}
-
-body[data-game="hollow-knight"] .time-input {
-    border-color: #70839e;
-}
-
-body[data-game="cuphead"] * {
-    font-weight: 700;
-}
+body:is([data-game="hollow-knight"], [data-game="silksong"]) .boss { left:0; }
+body:is([data-game="hollow-knight"], [data-game="silksong"]) .split-cell { min-width:220px; width:220px; }
+.hollow-knight-personal-total { width:420px; table-layout:fixed; margin-top:8px; }
+.hollow-knight-personal-total .total-label { width:220px; }
+.hollow-knight-personal-total .personal-time-col { width:200px; min-width:200px; }
+.hollow-knight-personal-total .total-time-wrapper { justify-content:space-between; }
+.hollow-knight-total-row > * { border-top:3px solid var(--panel-border); }
+.hollow-knight-total-row .total-label { position:sticky; left:0; z-index:25; }
 
 .pages {
     position: relative;
@@ -1372,7 +1218,6 @@ body.compact-mode .time-history-chart { height:190px; }
     }
 
     .pages {
-        flex-wrap: wrap;
         gap: 8px 16px;
         min-height: 72px;
     }
@@ -1403,3 +1248,47 @@ body.compact-mode .time-history-chart { height:190px; }
 
 .browser-history-hint { text-align: center; margin: 0 0 10px; }
 .browser-history-hint a { color: #cad6e2; font-size: .9rem; }
+
+.training-table-brand { grid-column:2; display:flex; align-items:center; justify-content:center; gap:clamp(8px, 2vw, 16px); min-width:0; }
+.training-table-title {
+    min-width:0; margin:0; font-family:"Silentina Local", "Alegreya Sans SC", "Arial Black", sans-serif;
+    font-size:clamp(15px, 3.4vw, 38px); font-weight:700; line-height:1.12;
+    text-align:center; text-transform:uppercase; text-wrap:balance; overflow-wrap:anywhere; text-shadow:0 2px 4px #101419;
+}
+body[data-game="hollow-knight"] .training-table-title { font-family:"Trajan Local", Perpetua, "Cinzel", Georgia, serif; }
+body[data-game="silksong"] .training-table-title { font-family:Perpetua, "Cinzel", Georgia, serif; text-transform:none; }
+.game-picker { position:relative; z-index:110; flex:0 0 clamp(70px, 17vw, 150px); }
+.game-picker :is(summary, button) {
+    display:grid; position:relative; place-items:center; width:100%; aspect-ratio:460/215;
+    padding:0; overflow:hidden; border:1px solid #687482; border-radius:8px; background:#15202a;
+    color:#edf1f5; font:inherit; cursor:pointer;
+}
+.game-picker summary::-webkit-details-marker { display:none; }
+.game-picker :is(summary, button):is(:hover, :focus-visible) { border-color:#e0b965; }
+.game-picker img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+.game-picker-chevron {
+    position:absolute; right:4px; bottom:4px; display:grid; place-items:center; width:18px; height:18px;
+    border-radius:50%; background:#151a20eb;
+}
+.game-picker-chevron::before { content:""; width:7px; height:7px; border:solid currentColor; border-width:0 2px 2px 0; transform:translateY(-2px) rotate(45deg); }
+.game-picker[open] .game-picker-chevron::before { transform:translateY(2px) rotate(225deg); }
+.game-choices {
+    position:absolute; top:calc(100% + 6px); inset-inline-start:0; width:max(100%, 150px); display:grid; gap:6px;
+    padding:6px; border:1px solid #687482; border-radius:8px; background:#151a20; box-shadow:0 6px 16px #0008;
+}
+body:not([data-game="cuphead"]) .cuphead-only { display:none; }
+
+/* Add color to inactive navigation glyphs and reduce the largest corner radii. */
+.icon-reveal:not(:is(.active, .active-info, .is-active)) > svg { color:var(--nav-icon-color, #b9d7ee); }
+.icon-reveal:is([data-i18n-aria-label="nav.training"], [data-i18n-aria-label="nav.enter-times"]) { --nav-icon-color:#e9bd69; }
+.icon-reveal[data-i18n-aria-label="nav.time-table"] { --nav-icon-color:#9ccce4; }
+.icon-reveal:is([data-i18n-aria-label="nav.attempt-log"], [data-i18n-aria-label="projection.boss-log"]) { --nav-icon-color:#a6cfae; }
+.icon-reveal[data-i18n-aria-label="projection.title"] { --nav-icon-color:#e2a884; }
+.icon-reveal:is([data-i18n-aria-label="nav.backups"], [data-i18n-aria-label="recap.title"]) { --nav-icon-color:#c7b6e8; }
+
+table, .rank-chart, .info-page .info-section, .boss-detail-view, .history-card,
+.recent-attempt-card, .improvement-cards > div { border-radius:6px; }
+.page-tabs, body.compact-mode .page-tabs, .detail-tabs, .category-tab,
+.boss-stat-card, .boss-detail-bossbar, .data-control-btn, .game-choices { border-radius:5px; }
+.page-tabs a, .page-tabs .info-nav-btn.icon-reveal, .detail-tabs button,
+.game-picker :is(summary, button), .icon-caption { border-radius:4px; }

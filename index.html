@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cuphead Training App</title>
-    <link rel="stylesheet" href="style.css?v=myekul-background">
+    <link rel="stylesheet" href="style.css?v=icon-accents">
 </head>
 <body data-page="personal-times">
 
 <div class="pages">
-    <div id="bigtitle">Cuphead Training App</div>
+    <div class="training-table-brand">
+        <details class="game-picker" id="game-picker"><summary></summary><div class="game-choices"></div></details>
+        <h1 class="training-table-title" data-i18n="ui.training-table-title">Speedrunning training table</h1>
+    </div>
     <a href="info.html" class="info-nav-btn" data-i18n-aria-label="ui.info-aria" aria-label="How it works">&#9432;</a>
 
     <button id="lang-toggle-btn" class="lang-toggle-btn-inline" type="button" onclick="setActiveLanguage(getActiveLanguage() === 'pt-BR' ? 'en' : 'pt-BR')" data-i18n-aria-label="ui.language-aria" aria-label="Toggle language">
@@ -44,20 +47,21 @@
     </div>
 
     <script src="js/sound-effects.js"></script>
-<script src="data.js?v=reverse-rank-wheel"></script>
-    <script src="js/state.js"></script>
+    <script src="js/game-toggle.js?v=steam-banner-picker"></script>
+<script src="data.js?v=silksong-saturation"></script>
+    <script src="js/state.js?v=game-selection"></script>
     <script src="js/time.js"></script>
-    <script src="js/category.js"></script>
+    <script src="js/category.js?v=game-selection"></script>
     <script src="js/data-access.js"></script>
     <script src="js/ranks.js?v=wheel-ranks"></script>
-    <script src="js/calculations.js"></script>
+    <script src="js/calculations.js?v=game-selection"></script>
     <script src="js/wr-times.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/render-time-table.js?v=1.1.0"></script>
-    <script src="js/render-personal.js?v=1.1.0"></script>
-    <script src="js/render.js?v=manual-times"></script>
-    <script src="js/language.js?v=pt-title"></script>
-    <script src="js/main.js"></script>
+    <script src="js/storage.js?v=game-selection"></script>
+    <script src="js/render-time-table.js?v=game-selection"></script>
+    <script src="js/render-personal.js?v=game-selection"></script>
+    <script src="js/render.js?v=silksong-warm-splits"></script>
+    <script src="js/language.js?v=compact-game-banner"></script>
+    <script src="js/main.js?v=game-selection"></script>
 
 </body>
 </html>

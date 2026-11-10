@@ -6,9 +6,11 @@ async function initializeApp()
     generateAllLevelTimes();
     renderActivePage();
     // Render local data first; an unavailable reference site must not blank Training.
-    await fetchAndUpdateWrTimes();
-    generateAllLevelTimes();
-    renderActivePage();
+    if (activeGame === "cuphead") {
+        await fetchAndUpdateWrTimes();
+        generateAllLevelTimes();
+        renderActivePage();
+    }
 }
 
 activeCategory = getInitialCategory();

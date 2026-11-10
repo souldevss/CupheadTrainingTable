@@ -7,9 +7,8 @@ const rankChartPie = document.getElementById("rank-chart-pie");
 const categoryTabs = document.getElementById("category-tabs");
 
 const isPersonalTimesPage = document.body.dataset.page === "personal-times";
-const categories = typeof speedrunCategories === "undefined"
-    ? [{ id: "1-1", label: "1.1", title: "Game Version 1.1", description: "", islands }]
-    : speedrunCategories;
+const categories = activeGame === "hollow-knight" ? hollowKnightCategories
+    : activeGame === "silksong" ? silksongCategories : speedrunCategories;
 
 const APP_SOUND_URLS = {
     selection: "https://myekul.com/shared-assets/cuphead/sfx/category_select.wav",

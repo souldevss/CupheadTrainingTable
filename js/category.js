@@ -1,4 +1,5 @@
 // Category tabs and localStorage migration
+const categoryStorageKey = `${trainingGames[activeGame].storage}SpeedrunCategory`;
 
 /**
  * Retrieves the initially selected category from localStorage
@@ -16,7 +17,7 @@ function setActiveCategorySelection(nextCategoryId, nextSubOptionId = null)
         : null;
 
     localStorage.setItem(
-        "cupheadSpeedrunCategory",
+        categoryStorageKey,
         activeCategory.id
     );
 
@@ -31,9 +32,10 @@ function setActiveCategorySelection(nextCategoryId, nextSubOptionId = null)
 
 function getInitialCategory()
 {
-    const storedCategoryId = localStorage.getItem(
-        "cupheadSpeedrunCategory"
-    );
+    const storedCategoryId = localStorage.getItem(categoryStorageKey);
+    if (activeGame !== "cuphead") {
+        return categories.find(category => category.id === storedCategoryId) || categories[0];
+    }
 
     if (storedCategoryId === "version-1-1") {
         localStorage.setItem("cupheadSpeedrunCategory", "1-1");

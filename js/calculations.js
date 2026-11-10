@@ -40,6 +40,14 @@ function getPersonalTimeEntries()
 function getPersonalTotalsData()
 {
     const entries = getPersonalTimeEntries();
+    if (activeGame !== "cuphead") {
+        const hasAllTimes = entries.length === getActiveLevels().length && entries.every(entry => entry.seconds !== null);
+        return [{
+            name: "Total",
+            total: hasAllTimes ? roundTime(entries.reduce((sum, entry) => sum + entry.seconds, 0)) : null,
+            thresholds: getActiveLevelRankTotals()
+        }];
+    }
     const islandRows = [];
     let entryIndex = 0;
 

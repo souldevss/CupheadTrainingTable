@@ -19,6 +19,8 @@ const TRANSLATIONS = {
         "ui.compact-on": "Compact mode: On",
         "ui.info-aria": "How it works",
         "ui.language-aria": "Toggle language",
+        "ui.choose-game": "{game} · Choose a game",
+        "ui.training-table-title": "Speedrunning training table",
         "ui.switch-to-english": "Switch to English",
         "ui.switch-to-portuguese": "Switch to Portuguese",
 
@@ -291,6 +293,8 @@ const TRANSLATIONS = {
         "ui.compact-on": "Modo compacto: ativado",
         "ui.info-aria": "Como funciona",
         "ui.language-aria": "Trocar idioma",
+        "ui.choose-game": "{game} · Escolher jogo",
+        "ui.training-table-title": "Tabela de treino de speedrun",
         "ui.switch-to-english": "Mudar para inglês",
         "ui.switch-to-portuguese": "Mudar para português",
 
@@ -604,6 +608,7 @@ function translateWatcherStatus(status)
 function applyLanguage(lang)
 {
     document.documentElement.lang = lang === "pt-BR" ? "pt-BR" : "en";
+    gameBanner.setAttribute("aria-label", tf("ui.choose-game", { game: trainingGames[activeGame].name }));
 
     // Update page title
     const isInfoPage = document.body.dataset.page === "info";
@@ -612,9 +617,10 @@ function applyLanguage(lang)
         : document.body.dataset.page === "attempt-log" ? t("page.title.attempts")
         : t("page.title");
 
-    // Update the visible heading.
-    const bigtitle = document.getElementById("bigtitle");
-    if (bigtitle) bigtitle.textContent = t("bigtitle.alt");
+    if (activeGame !== "cuphead") {
+        document.title = lang === "pt-BR" ? `Tabela de treino de ${trainingGames[activeGame].name}`
+            : `${trainingGames[activeGame].name} Training Table`;
+    }
 
     // Translate nav links with data-i18n
     document.querySelectorAll("[data-i18n]").forEach(el => {
@@ -671,8 +677,8 @@ function applyLanguage(lang)
     if (typeof window.refreshHostLanguage === "function") window.refreshHostLanguage();
 
     // Re-render table on time table page
-    if (typeof activeCategory !== "undefined" && activeCategory && document.body.dataset.page === "time-table" && typeof renderTimeTable === "function") {
-        renderTimeTable();
+    if (typeof activeCategory !== "undefined" && activeCategory && document.body.dataset.page === "time-table" && typeof renderTimeTablePage === "function") {
+        renderTimeTablePage();
     }
 
     // Re-render personal times page
