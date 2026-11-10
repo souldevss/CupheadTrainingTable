@@ -12,7 +12,8 @@ function renderTimeTablePage()
 
     const hasIslands = activeGame === "cuphead";
     let html = `
-<table>
+<table class="reference-table">
+<colgroup>${hasIslands ? '<col class="reference-isle">' : ''}<col class="reference-boss"><col span="${ranks.length}"></colgroup>
 <thead>
 <tr>
     ${hasIslands ? `<th class="island sticky-col-1">${t("header.islands")}</th>` : ""}
@@ -36,7 +37,7 @@ function renderTimeTablePage()
         if (island && index === 0) {
             html += `
             <td rowspan="${island.levels.length}" class="island isle-artwork" style="background-color:${island.color}; color:${island.textcolor}; ${isleArtworkStyle(island.name, island.color)}">
-                ${island.name}
+                ${escapeAttribute(cupheadDisplayName(island.name))}
             </td>`;
         }
 
@@ -83,9 +84,7 @@ function renderTimeTablePage()
     totals.hidden = !hasIslands;
     if (hasIslands) renderTimeTableTotals();
 
-    requestAnimationFrame(matchColumnWidths);
-    window.addEventListener("load", matchColumnWidths);
-    window.addEventListener("resize", matchColumnWidths);
+
 }
 
 /**
@@ -94,7 +93,8 @@ function renderTimeTablePage()
 function renderTimeTableTotals()
 {
     let totalsHtml = `
-<table>
+<table class="reference-table">
+<colgroup><col class="reference-total-label"><col span="${ranks.length}"></colgroup>
 <thead>
 <tr>
     <th class="island sticky-col-1">${t("header.isle-times")}</th>
@@ -110,7 +110,7 @@ function renderTimeTableTotals()
         const rowStyle = totalsRowsStyles.find(r => r.name === activeIslands[i].name) || { background: "#333", color: "#fff" };
         totalsHtml += `
     <tr>
-        <td class="island sticky-col-1 isle-artwork" style="background-color: ${rowStyle.background}; color: ${rowStyle.color}; ${isleArtworkStyle(activeIslands[i].name, rowStyle.background)}">${activeIslands[i].name}</td>
+        <td class="island sticky-col-1 isle-artwork" style="background-color: ${rowStyle.background}; color: ${rowStyle.color}; ${isleArtworkStyle(activeIslands[i].name, rowStyle.background)}">${escapeAttribute(cupheadDisplayName(activeIslands[i].name))}</td>
         ${ranks.map((_, rankIndex) =>
         {
             const total = getIslandTotal(i, rankIndex);

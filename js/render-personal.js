@@ -27,40 +27,13 @@ function renderPersonalTimesPage()
     const storedTimes = getStoredPersonalTimes();
     let levelCounter = 0;
     const hasIslands = activeGame === "cuphead";
-    let html = `
-<table class="personal-table">
-<thead>
-<tr>
-    ${hasIslands ? `<th class="island sticky-col-1">${t("header.islands")}</th>` : ""}
-    <th class="boss ${hasIslands ? "sticky-col-2" : "split-cell"}">${hasIslands ? t("header.levels") : t("personal.split")}</th>
-    <th class="personal-time-col"></th>
-</tr>
-</thead>
-<tbody>
-`;
-
-    const renderLevelRow = (boss, island = null, index = 0) =>
-        {
-            const inputId = `personal-time-${levelCounter}`;
-            const rowStyle = getPersonalRankStyle(null);
-
-            html += "<tr>";
-
-            if (island && index === 0) {
-                html += `
-            <td
-                rowspan="${island.levels.length}"
-                class="island"
-                style="background:${island.color}; color:${island.textcolor};"
-            >
-                ${island.name}
-            </td>
-            `;
-            }
-
-            html += `${createBossCellMarkup(boss)}
+    const rowStyle = getPersonalRankStyle(null);
+    const renderLevelRow = boss => {
+        const index = levelCounter++;
+        const inputId = `personal-time-${index}`;
+        return `<tr>${createBossCellMarkup(boss)}
         <td class="personal-time-col">
-            <div class="time-input-wrapper" data-time-wrapper="${levelCounter}">
+            <div class="time-input-wrapper" data-time-wrapper="${index}">
                 <input
                     id="${inputId}"
                     class="time-input"
@@ -69,29 +42,31 @@ function renderPersonalTimesPage()
                     autocomplete="off"
                     placeholder="0:00.00"
                     value="${escapeAttribute(storedTimes[inputId] || "")}"
-                    data-level-index="${levelCounter}"
+                    data-level-index="${index}"
                 >
-                <span class="time-rank-display" data-rank-output="${levelCounter}" style="background: ${rowStyle.background}; color: ${rowStyle.color};">-</span>
+                <span class="time-rank-display" data-rank-output="${index}" style="background: ${rowStyle.background}; color: ${rowStyle.color};">-</span>
             </div>
-        </td>
-        `;
+        </td></tr>`;
+    };
 
-            html += "</tr>";
-            levelCounter++;
-        };
-
+    document.querySelector(".board-layout").classList.toggle("training-board", hasIslands);
+    let html;
     if (hasIslands) {
+        const groups = [];
         for (const island of getActiveIslands()) {
-            island.levels.forEach((boss, index) => renderLevelRow(boss, island, index));
+            if (groups.length && (activeCategory.id === "DLC" || island.name === "Inkwell Hell")) groups.at(-1).push(island);
+            else groups.push([island]);
         }
+        const renderIsle = island => `<table class="training-isle">
+<colgroup><col><col class="training-time-width"></colgroup>
+<thead><tr><th colspan="2" class="isle-artwork" style="background-color:${island.color}; color:${island.textcolor}; ${isleArtworkStyle(island.name, island.color)}">${escapeAttribute(cupheadDisplayName(island.name))}</th></tr></thead>
+<tbody>${island.levels.map(renderLevelRow).join("")}</tbody></table>`;
+        html = groups.map(group => `<div class="training-isle-group">${group.map(renderIsle).join("")}</div>`).join("");
     } else {
-        getActiveLevels().forEach(boss => renderLevelRow(boss));
+        html = `<table class="personal-table">
+<thead><tr><th class="boss split-cell">${t("personal.split")}</th><th class="personal-time-col"></th></tr></thead>
+<tbody>${getActiveLevels().map(renderLevelRow).join("")}</tbody></table>`;
     }
-
-    html += `
-</tbody>
-</table>
-`;
 
     table.innerHTML = html;
     renderPersonalTotals();
@@ -99,37 +74,6 @@ function renderPersonalTimesPage()
     renderRankChart();
 
     const personalInputs = [...table.querySelectorAll(".time-input")];
-
-    if (personalInputs.length > 0) {
-        table.addEventListener("keydown", event => {
-            const target = event.target;
-            if (!(target instanceof HTMLInputElement) || !target.classList.contains("time-input")) return;
-            if (event.key !== "Enter" && event.key !== "NumpadEnter") return;
-
-            event.preventDefault();
-            const currentIndex = personalInputs.indexOf(target);
-            const targetIndex = currentIndex >= 0 ? (currentIndex + 1) % personalInputs.length : 0;
-            const nextInput = personalInputs[targetIndex];
-
-            if (nextInput) {
-                target.dispatchEvent(new Event("blur", { bubbles: true }));
-                nextInput.focus();
-                nextInput.select();
-            }
-        });
-
-        document.addEventListener("keydown", event => {
-            if (event.key !== "Enter" && event.key !== "NumpadEnter") return;
-            if (document.activeElement instanceof HTMLInputElement) return;
-
-            event.preventDefault();
-            const firstInput = personalInputs[0];
-            if (firstInput) {
-                firstInput.focus();
-                firstInput.select();
-            }
-        });
-    }
 
     personalInputs.forEach(input => {
         let loopAudio = null;
@@ -218,7 +162,7 @@ function renderPersonalTotals()
 
         totalsHtml += `
     <tr ${tooltipAttr}>
-        <td class="island sticky-col-1 isle-artwork" style="background-color: ${rowStyle.background}; color: ${rowStyle.color}; ${isleArtworkStyle(row.name, rowStyle.background)}">${row.name}</td>
+        <td class="island sticky-col-1 isle-artwork" style="background-color: ${rowStyle.background}; color: ${rowStyle.color}; ${isleArtworkStyle(row.name, rowStyle.background)}">${escapeAttribute(cupheadDisplayName(row.name))}</td>
         <td class="personal-time-col" style="background: ${rankStyle.background}; color: ${rankStyle.color};">
             <div class="time-input-wrapper" style="background: transparent !important; justify-content: space-between; padding: 1px 6px;">
                 <span>${row.total === null ? "-" : formatTime(row.total)}</span>
@@ -239,14 +183,15 @@ function renderPersonalTotals()
     totals.innerHTML = totalsHtml;
 
     const tooltipRows = totals.querySelectorAll("[data-tooltip]");
-    const infoTooltip = document.createElement("div");
+    let infoTooltip = document.querySelector(".info-tooltip");
+    if (!infoTooltip) infoTooltip = document.createElement("div");
     infoTooltip.className = "info-tooltip";
     infoTooltip.style.position = "fixed";
     infoTooltip.style.zIndex = "10000";
     infoTooltip.style.pointerEvents = "none";
     infoTooltip.style.opacity = "0";
     infoTooltip.style.transition = "opacity 0.15s ease";
-    document.body.appendChild(infoTooltip);
+    if (!infoTooltip.isConnected) document.body.appendChild(infoTooltip);
 
     tooltipRows.forEach(row => {
         row.addEventListener("mouseenter", () => {
@@ -549,4 +494,19 @@ function renderPlaceholderTable()
     if (rankChartPie) {
         rankChartPie.innerHTML = "";
     }
+}
+
+if (isPersonalTimesPage) {
+    document.addEventListener("keydown", event => {
+        if (event.key !== "Enter" && event.key !== "NumpadEnter") return;
+        const inputs = [...table.querySelectorAll(".time-input")];
+        if (!inputs.length) return;
+        const index = inputs.indexOf(document.activeElement);
+        if (document.activeElement instanceof HTMLInputElement && index < 0) return;
+        event.preventDefault();
+        const next = inputs[(index + 1) % inputs.length];
+        if (index >= 0) inputs[index].dispatchEvent(new Event("blur", { bubbles: true }));
+        next.focus();
+        next.select();
+    });
 }

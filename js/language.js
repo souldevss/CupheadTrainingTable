@@ -605,6 +605,48 @@ function translateWatcherStatus(status)
     return status;
 }
 
+const cupheadNamesPtBr = {
+    "Inkwell Isle I": "Ilha Tinteiro I",
+    "Inkwell Isle 1": "Ilha Tinteiro I",
+    "Inkwell Isle II": "Ilha Tinteiro II",
+    "Inkwell Isle III": "Ilha Tinteiro III",
+    "Inkwell Isle 4": "Ilha Tinteiro IV",
+    "Inkwell Hell": "Tinteiro Infernal",
+    "Forest Follies": "Folia na Floresta",
+    "The Root Pack": "Máfia da Raiz",
+    "Ribby & Croaks": "Escoaxo e Sopapo",
+    "Goopy Le Grande": "Il Melecone",
+    "Hilda Berg": "Geni Buarque",
+    "Cagney Carnation": "Cactônio Spinoza",
+    "Baroness Von Bon Bon": "Baronesa Bombom",
+    "Wally Warbles": "Tião Gavião",
+    "Djimmi The Great": "Genésio, o Magnífico",
+    "Beppi The Clown": "Zobo, o Palhaço",
+    "Grim Matchstick": "Fogo de Chão",
+    "Rumor Honeybottoms": "Abélia Reale",
+    "Dr. Kahl's Robot": "Robô do Dr. Kalo",
+    "Sally Stageplay": "Paula Protagonista",
+    "Werner Werman": "Maus Von Kampf",
+    "Captain Brineybeard": "Capitão Barba-Salgada",
+    "Cala Maria": "Dona Iara",
+    "Phantom Express": "Expresso Fantasma",
+    "King Dice": "Rei Dado",
+    "The Devil": "O Diabo",
+    "Mausoleum": "Mausoléu",
+    "Glumstone The Giant": "Monty Turrão",
+    "Mortimer Freeze": "Gelaldo, o Mago",
+    "The Howling Aces": "Os Uivos do Vento",
+    "Esther Winchester": "Maria Muunita",
+    "Moonshine Mob": "Gangue da Marvada",
+    "Chef Saltbaker": "Chef Pitadinha"
+};
+
+function cupheadDisplayName(name)
+{
+    return getActiveLanguage() === "pt-BR" && Object.hasOwn(cupheadNamesPtBr, name)
+        ? cupheadNamesPtBr[name] : name;
+}
+
 function applyLanguage(lang)
 {
     document.documentElement.lang = lang === "pt-BR" ? "pt-BR" : "en";
@@ -688,21 +730,23 @@ function applyLanguage(lang)
     }
 }
 
+const navigationArtwork = {
+    "nav.training": "training.png",
+    "nav.enter-times": "training.png",
+    "nav.time-table": "time-table.png",
+    "ui.info-aria": "info.png",
+};
+
 const navigationIcons = {
-    "nav.training": '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
-    "nav.time-table": '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M10 9v11"/>',
-    "nav.attempt-log": '<rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 8h6m-6 4h6m-6 4h4"/>',
-    "nav.backups": '<path d="M4 9h16v11H4zM3 5h18v4H3zM9 13h6"/>',
-    "ui.info-aria": '<circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/>',
-    "projection.boss-log": '<path d="M5 21V4m0 1c5-4 9 4 15 0v10c-6 4-10-4-15 0"/>',
-    "projection.title": '<circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 6h8a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h8"/>',
-    "recap.title": '<path d="M5 3h10l4 4v14H5zM14 3v5h5M8 16l3-3 2 2 3-4"/>',
-    island: '<path d="M2 18h20M4 15l5-6 3 3 4-7 4 10"/>',
-    boss: '<path d="m3 7 5 4 4-6 4 6 5-4-2 11H5z"/>'
+    island: '<path d="M1 19h22v2H1zm2-2 5-8 4 4 4-9 5 13z"/>',
+    boss: '<path d="m2 6 6 4 4-7 4 7 6-4-3 12H5zm4 14h12v2H6z"/>'
 };
 
 function navigationIcon(key) {
-    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${navigationIcons[key]}</svg>`;
+    if (Object.hasOwn(navigationArtwork, key)) {
+        return `<img class="nav-artwork" src="assets/icons/${navigationArtwork[key]}?v=refreshed-icons" alt="" draggable="false">`;
+    }
+    return `<svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" aria-hidden="true">${navigationIcons[key]}</svg>`;
 }
 
 function setupIconNavigation() {
@@ -722,7 +766,7 @@ function setupIconNavigation() {
 
     document.querySelectorAll(".page-tabs a, .autolog-view-tabs button").forEach(control => {
         const key = control.dataset.i18n || control.dataset.i18nAriaLabel;
-        if (!Object.hasOwn(navigationIcons, key)) return;
+        if (!Object.hasOwn(navigationArtwork, key) && !Object.hasOwn(navigationIcons, key)) return;
         control.removeAttribute("data-i18n");
         control.dataset.i18nAriaLabel = key;
         control.classList.add("icon-reveal");

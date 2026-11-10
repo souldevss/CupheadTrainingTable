@@ -1,16 +1,12 @@
 // Application entry point
 
-async function initializeApp()
+function initializeApp()
 {
+    if (activeGame === "cuphead") updateReferenceTimes();
     renderCategoryControls();
     generateAllLevelTimes();
     renderActivePage();
-    // Render local data first; an unavailable reference site must not blank Training.
-    if (activeGame === "cuphead") {
-        await fetchAndUpdateWrTimes();
-        generateAllLevelTimes();
-        renderActivePage();
-    }
+
 }
 
 activeCategory = getInitialCategory();
