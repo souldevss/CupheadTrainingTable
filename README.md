@@ -2,6 +2,9 @@
 
 The browser edition of Cuphead Training App. Open the [online table](https://souldevss.github.io/CupheadTrainingTable/).
 
+> [!WARNING]
+> **This project is vibe-coded.** It was built with AI assistance. If you are not OK with that, don't download. Expect bugs, especially on game builds or setups that haven’t been tested.
+
 Enter your best times for each boss in **Enter Times** and compare them with rank targets in **Time Table**. Times are saved in your browser and can be imported or exported as JSON. Both pages use the desktop rank colors and island artwork.
 
 Live game tracking and Compact mode are available in the [Windows app](https://github.com/souldevss/CupheadTrainingApp/releases/latest).
